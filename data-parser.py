@@ -13,3 +13,6 @@ if not os.path.isdir("./data") or len(sys.argv) > 1 and sys.argv[1] == "-r":
         "DDSC/dkhate", token=os.getenv('HUGGING_FACE_ACCESS_TOKEN')).save_to_disk("./data")
 
 dataset = load_from_disk("./data")
+
+dataset_train = dataset["train"]
+dataset_test = dataset["test"]
