@@ -17,6 +17,19 @@ dataset = load_from_disk("./data")
 dataset_train = dataset["train"]
 dataset_test = dataset["test"]
 
+
+def get_test():
+    return dataset_test
+
+
+def get_test_comments():
+    return dataset_test["text"]
+
+
+def get_train():
+    return dataset_train
+
+
 def majority_offensive(dataset: DatasetDict):
     labels = dataset["label"]
 
@@ -25,5 +38,5 @@ def majority_offensive(dataset: DatasetDict):
     for label in labels:
         if label == "OFF":
             off_label_amount += 1
-    
+
     return 100 * (off_label_amount/len(labels))
