@@ -20,6 +20,12 @@
     pip install --upgrade pip
     ```
 
+1. Install requirements from the list
+
+    ```sh
+    pip install -r requirements.txt
+    ```
+
 ### Saving and Loading requirements
 
 This is only needed if packages needs to be synced with e.g. collaborators or your future self
