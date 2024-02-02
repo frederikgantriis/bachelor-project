@@ -1,6 +1,6 @@
 import os
 import sys
-from datasets import load_dataset, load_from_disk
+from datasets import load_dataset, load_from_disk, DatasetDict
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -16,3 +16,14 @@ dataset = load_from_disk("./data")
 
 dataset_train = dataset["train"]
 dataset_test = dataset["test"]
+
+def majority_offensive(dataset: DatasetDict):
+    labels = dataset["label"]
+
+    off_label_amount = 0
+
+    for label in labels:
+        if label == "OFF":
+            off_label_amount += 1
+    
+    return 100 * (off_label_amount/len(labels))
