@@ -5,12 +5,17 @@ def f1_score():
     return
 
 
-def calculate_precision():
-    return
+def calculate_precision(test_result_labels, result_labels):
+    true_positives = calculate_true_positives(
+        test_result_labels, result_labels)
+
+    return true_positives / (true_positives + calculate_true_negatives(test_result_labels, result_labels))
 
 
-def calculate_recall():
-    return
+def calculate_recall(test_result_labels, result_labels):
+    true_positives = calculate_true_positives(test_result_labels, result_labels)
+
+    return true_positives / (true_positives + calculate_false_negatives(test_result_labels, result_labels))
 
 
 def calculate_false_positives(test_result_labels, result_labels):

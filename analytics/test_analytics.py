@@ -1,4 +1,4 @@
-from analytics import calculate_false_negatives, calculate_false_positives, calculate_true_negatives, calculate_true_positives
+from analytics import calculate_false_negatives, calculate_false_positives, calculate_true_negatives, calculate_true_positives, calculate_precision, calculate_recall
 
 
 """
@@ -26,3 +26,9 @@ def test_calculate_false_positives():
 
 def test_calculate_false_negatives():
     assert calculate_false_negatives(test_result, result) == 1
+
+def test_calculate_precision():
+    assert calculate_precision(test_result, result) == 2 / 3
+
+def test_calculate_recall():
+    assert calculate_recall(test_result, result) == 2 / 3
