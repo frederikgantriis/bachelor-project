@@ -12,6 +12,12 @@
     source env/bin/activate
     ```
 
+    Windows:
+
+    ```sh
+    .\env\Scripts\Activate.ps1
+    ```
+
     Typing `deactivate` in the shell will exit the environment
 
 3. Update pip
