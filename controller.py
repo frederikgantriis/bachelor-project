@@ -1,5 +1,5 @@
-from data_parser import get_test_comments, get_test_labels
-from models import baseline_random
+from data_parser import get_test_comments, get_test_labels, get_train
+from models import baseline_random, naive_bayes
 
 
 def test_random():
@@ -8,6 +8,11 @@ def test_random():
     result = baseline_random.test(test_comments)
 
     return compare_with_test_data(result)
+
+def train_naive_bayes():
+    train_data = get_train()
+
+    return naive_bayes.classify_words(train_data)
 
 
 def compare_with_test_data(results):

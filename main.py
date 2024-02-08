@@ -1,3 +1,6 @@
-from controller import test_random
+from controller import *
 
-print(test_random())
+
+test = train_naive_bayes()
+
+print(test[1]["Idiot"])

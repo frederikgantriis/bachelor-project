@@ -1,5 +1,5 @@
 import random
-from models.model_library import get_labels
+from models.utils import get_labels
 
 
 def test(comments):
