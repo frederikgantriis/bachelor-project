@@ -9,10 +9,11 @@ def test_random():
 
     return compare_with_test_data(result)
 
+
 def train_naive_bayes():
     train_data = get_train()
 
-    return naive_bayes.classify_words(train_data)
+    return naive_bayes.train(train_data)
 
 
 def compare_with_test_data(results):
