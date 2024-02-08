@@ -29,4 +29,4 @@ def compare_with_test_data(results):
 
 
 if __name__ == "__main__":
-    train_naive_bayes()
+    naive_bayes.main(get_train())
