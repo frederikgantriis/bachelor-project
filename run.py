@@ -26,3 +26,7 @@ def compare_with_test_data(results):
             correct_results += 1
 
     return 100 * (correct_results/len(test_labels))
+
+
+if __name__ == "__main__":
+    train_naive_bayes()
