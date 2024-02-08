@@ -26,11 +26,15 @@ def get_test_comments():
     return dataset_test["text"]
 
 
+def get_test_labels():
+    return dataset_test["label"]
+
+
 def get_train():
     return dataset_train
 
 
-def majority_offensive(dataset: DatasetDict):
+def majority_offensive_labels(dataset: DatasetDict):
     labels = dataset["label"]
 
     off_label_amount = 0
