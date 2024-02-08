@@ -9,6 +9,7 @@ def test_random():
 
     return compare_with_test_data(result)
 
+
 def train_naive_bayes():
     train_data = get_train()
 
@@ -25,3 +26,7 @@ def compare_with_test_data(results):
             correct_results += 1
 
     return 100 * (correct_results/len(test_labels))
+
+
+if __name__ == "__main__":
+    train_naive_bayes()
