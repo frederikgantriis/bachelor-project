@@ -9,7 +9,9 @@ from storage_manager import StorageManager
 class NaiveBayes(MlAlgorithm):
     def __init__(self, dataset: DatasetDict) -> None:
         super().__init__(dataset)
+        # base chance based on the split in classes in the dataset
         self.logprior = {}
+        # Chance for each word to belong to each class
         self.loglikelihood = {}
 
         # amount of documents aka. comments/sentences in the dataset
@@ -26,7 +28,7 @@ class NaiveBayes(MlAlgorithm):
         for c in self.classes:
             # amount of instances with this class
             n_classes = self.dataset["label"].count(c)
-
+            # it gives a base chance for it being NOT or OFF based on the split in the dataset
             self.logprior[c] = math.log10(n_classes / self.n_documents)
 
             words_in_class = utils.extract_words_from_label(self.dataset, c)
@@ -35,7 +37,9 @@ class NaiveBayes(MlAlgorithm):
             for word in self.vocabulary:
                 count = words_in_class[word] if word in words_in_class else 0
 
-                # compute the likelihood of this word being generated from this class
+                # compute the likelihood of this word being generated from this class based on 
+                # the amount of the word used in the class compared to the total amount of 
+                # words used in the class.
                 self.loglikelihood[(word, c)] = math.log10(
                     (count + 1) / (n_words - count))
         self.sm.store_train_data()
