@@ -1,9 +1,9 @@
 import random
-from models.utils import get_labels
+from analytics.constants import NOT, OFF
 
 
 def test(comments):
-    labels = get_labels()
+    labels = [NOT, OFF]
 
     answer = []
 
