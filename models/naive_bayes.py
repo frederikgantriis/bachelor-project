@@ -14,7 +14,7 @@ class NaiveBayes(MLAlgorithm):
         # Chance for each word to belong to each class
         self.loglikelihood = {}
 
-        # amount of documents aka. comments/sentences in the dataset
+        # amount of instances aka. comments/sentences in the dataset
         self.n_instances = len(dataset["text"])
 
         # creates a list of all words in the dataset after sentences have been sanitized
@@ -37,8 +37,8 @@ class NaiveBayes(MLAlgorithm):
             for word in self.vocabulary:
                 count = words_in_class[word] if word in words_in_class else 0
 
-                # compute the likelihood of this word being generated from this class based on 
-                # the amount of the word used in the class compared to the total amount of 
+                # compute the likelihood of this word being generated from this class based on
+                # the amount of the word used in the class compared to the total amount of
                 # words used in the class.
                 self.loglikelihood[(word, c)] = math.log10(
                     (count + 1) / (n_words - count))
