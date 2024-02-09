@@ -1,79 +1,80 @@
-import utils
-from datasets import DatasetDict
 import math
-import pickle
+import utils
+
+from datasets import DatasetDict
+from models.ml_algoritmh import MlAlgorithm
+from storage_manager import StorageManager
 
 
-def train(dataset: DatasetDict):
-    n_documents = len(dataset["text"])
-    classes = set(dataset["label"])
-    logprior = {}
-    loglikelihood = {}
+class NaiveBayes(MlAlgorithm):
+    def __init__(self, dataset: DatasetDict) -> None:
+        super().__init__(dataset)
+        self.logprior = {}
+        self.loglikelihood = {}
 
-    vocabulary = [item for row in [
-        sanitize(comment) for comment in dataset["text"]] for item in row]
+        # set of unique classes in the dataset (i.e in our case "OFF" & "NOT")
+        self.classes = set(dataset["label"])
 
-    for c in classes:
-        n_classes = dataset["label"].count(c)
-        logprior[c] = math.log10(n_classes / n_documents)
-        print("extracting words...")
-        bigwords = extract_words_from_label(dataset, c)
-        n_words = count_words(bigwords, vocabulary)
-        print("words extracted")
-        print(n_words)
+        # amount of documents aka. comments/sentences in the dataset
+        self.n_documents = len(dataset["text"])
 
-        for word in vocabulary:
-            count = bigwords[word] if word in bigwords else 0
+        # creates a list of all words in the dataset after sentences have been sanitized
+        self.vocabulary = utils.flatten([utils.sanitize(comment)
+                                         for comment in self.dataset["text"]])
 
-            print("test:", count + 1, n_words - count)
-            loglikelihood[(word, c)] = math.log10(
-                (count + 1) / (n_words - count))
+        self.sm = StorageManager(
+            "nb_data", (self.logprior, self.loglikelihood, self.vocabulary))
 
-    return logprior, loglikelihood, vocabulary
+    def train(self):
+        for c in self.classes:
+            # amount of instances with this class
+            n_classes = self.dataset["label"].count(c)
 
+            self.logprior[c] = math.log10(n_classes / self.n_documents)
 
-def test(testdoc, logprior, loglikelihood, classes, vocabulary):
-    sum = {}
-    for c in classes:
-        sum[c] = logprior[c]
-        for word in testdoc:
+            words_in_class = utils.extract_words_from_label(self.dataset, c)
+            n_words = count_words(words_in_class, self.vocabulary)
+
+            for word in self.vocabulary:
+                count = words_in_class[word] if word in words_in_class else 0
+
+                # compute the likelihood of this word being generated from this class
+                self.loglikelihood[(word, c)] = math.log10(
+                    (count + 1) / (n_words - count))
+        self.sm.store_train_data()
+
+    def test(self, testdoc: str):
+        sum = {}
+        testdoc = utils.sanitize(testdoc)
+
+        for i in range(2):
             try:
-                sum[c] += loglikelihood[(word, c)]
-            except KeyError:
-                continue
+                logprior, loglikelihood, _ = self.sm.load_train_data()
+                print("Found Naive Bayes training data!")
+                break
+            except FileNotFoundError:
+                if i == 1:
+                    print("ERROR: terminating...")
+                    exit()
+                print("Naive Bayes training data not found:\nInitializing training...")
+                self.train()
 
-    print(sum)
-
-
-def store_train_data(logprior: dict, loglikelihood: dict, vocabulary: list):
-
-    with open('computed_data/nb_lp.pkl', 'wb') as f:
-        pickle.dump(logprior, f)
-    with open('computed_data/nb_ll.pkl', 'wb') as f:
-        pickle.dump(loglikelihood, f)
-    with open('computed_data/nb_v.pkl', 'wb') as f:
-        pickle.dump(vocabulary, f)
-
-
-def load_train_data() -> tuple[dict, dict, list]:
-    """loads all naive-bayes train data from computed_data/ folder
-
-    Returns:
-        tuple[dict, dict, list]: logprior, loglikelihood, vocabulary
-    """
-    with open('computed_data/nb_lp.pkl', 'rb') as f:
-        logprior = pickle.load(f)
-    with open('computed_data/nb_ll.pkl', 'rb') as f:
-        loglikelihood = pickle.load(f)
-    with open('computed_data/nb_v.pkl', 'rb') as f:
-        vocabulary = pickle.load(f)
-    return logprior, loglikelihood, vocabulary
+        for c in self.classes:
+            sum[c] = logprior[c]
+            for word in testdoc:
+                try:
+                    sum[c] += loglikelihood[(word, c)]
+                except KeyError:
+                    continue
+        return utils.get_max_value_key(sum)
 
 
-def main(dataset: DatasetDict):
-    # lp, ll, v = train(dataset)
-    # store_train_data(lp, ll, v)
+def count_words(words: dict, vocabulary: list):
+    sum = 0
+    for word in vocabulary:
+        if word in words:
+            sum += (words[word] + 1)
+        else:
+            sum += 1
 
-    lp, ll, v = load_train_data()
-    test(sanitize("hej med dig"),
-         lp, ll, set(dataset["label"]), v)
+    return sum
