@@ -3,3 +3,4 @@ env/
 .env
 data/
 __pycache__
+storage_manager_data/

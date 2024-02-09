@@ -1,19 +1,14 @@
 from data_parser import get_test_comments, get_test_labels, get_train
-from models import baseline_random, naive_bayes
+from models.baseline_random import BaselineRandom
+from models.naive_bayes import NaiveBayes
 
 
 def test_random():
-    test_comments = get_test_comments()
+    bs_random = BaselineRandom(get_train())
 
-    result = baseline_random.test(test_comments)
+    result = bs_random.test()
 
     return compare_with_test_data(result)
-
-
-def train_naive_bayes():
-    train_data = get_train()
-
-    return naive_bayes.classify_words(train_data)
 
 
 def compare_with_test_data(results):
@@ -29,4 +24,8 @@ def compare_with_test_data(results):
 
 
 if __name__ == "__main__":
-    train_naive_bayes()
+    nb = NaiveBayes(get_train())
+
+    result = nb.test("hej med dig")
+
+    print(result)
