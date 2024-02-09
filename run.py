@@ -1,31 +1,12 @@
-from data_parser import get_test_comments, get_test_labels, get_train
+from data_parser import get_train_dataset
 from models.baseline_random import BaselineRandom
 from models.naive_bayes import NaiveBayes
 
-
-def test_random():
-    bs_random = BaselineRandom(get_train())
-
-    result = bs_random.test()
-
-    return compare_with_test_data(result)
-
-
-def compare_with_test_data(results):
-    test_labels = get_test_labels()
-
-    correct_results = 0
-
-    for i in range(len(results)):
-        if test_labels[i] == results[i]:
-            correct_results += 1
-
-    return 100 * (correct_results/len(test_labels))
-
-
 if __name__ == "__main__":
-    nb = NaiveBayes(get_train())
+    nb = NaiveBayes(get_train_dataset())
+    bs_random = BaselineRandom(get_train_dataset())
 
     result = nb.test("hej med dig")
+    # result = bs_random.test()
 
     print(result)

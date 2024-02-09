@@ -1,6 +1,6 @@
 import os
 import sys
-from datasets import load_dataset, load_from_disk, DatasetDict
+from datasets import load_dataset, load_from_disk
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -14,33 +14,10 @@ if not os.path.isdir("./data") or len(sys.argv) > 1 and sys.argv[1] == "-r":
 
 dataset = load_from_disk("./data")
 
-dataset_train = dataset["train"]
-dataset_test = dataset["test"]
+
+def get_test_dataset():
+    return dataset["test"]
 
 
-def get_test():
-    return dataset_test
-
-
-def get_test_comments():
-    return dataset_test["text"]
-
-
-def get_test_labels():
-    return dataset_test["label"]
-
-
-def get_train():
-    return dataset_train
-
-
-def majority_offensive_labels(dataset: DatasetDict):
-    labels = dataset["label"]
-
-    off_label_amount = 0
-
-    for label in labels:
-        if label == "OFF":
-            off_label_amount += 1
-
-    return 100 * (off_label_amount/len(labels))
+def get_train_dataset():
+    return dataset["train"]
