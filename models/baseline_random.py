@@ -1,10 +1,10 @@
 import random
 
 from datasets import DatasetDict
-from models.ml_algoritmh import MlAlgorithm
+from models.ml_algoritmh import MLAlgorithm
 
 
-class BaselineRandom(MlAlgorithm):
+class BaselineRandom(MLAlgorithm):
     def __init__(self, dataset: DatasetDict) -> None:
         super().__init__(dataset)
         self.classes = set(self.dataset["label"])
