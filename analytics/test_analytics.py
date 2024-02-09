@@ -13,7 +13,7 @@ test_result = [NOT, OFF, NOT, OFF, OFF, OFF]
 
 test_dataset = {}
 
-test_dataset["labels"] = [NOT, OFF, OFF, NOT, OFF, NOT]
+test_dataset["label"] = [NOT, OFF, OFF, NOT, OFF, NOT]
 
 test_analytics = Analytics(test_result, test_dataset)
 
