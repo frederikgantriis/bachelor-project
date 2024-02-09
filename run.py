@@ -1,12 +1,19 @@
-from data_parser import get_train_dataset
+from data_parser import get_train_dataset, get_test_dataset
 from models.baseline_random import BaselineRandom
 from models.naive_bayes import NaiveBayes
+from analytics.analyse import Analytics
 
 if __name__ == "__main__":
     nb = NaiveBayes(get_train_dataset())
-    bs_random = BaselineRandom(get_train_dataset())
+    bs_random = BaselineRandom(get_test_dataset())
 
-    result = nb.test("hej med dig")
-    # result = bs_random.test()
+    baseResults = bs_random.test()
+    anBS = Analytics(baseResults, get_test_dataset())
+    results = nb.test(get_test_dataset()["text"])
+    
+    print("base f1:", anBS.f1_score())
 
-    print(result)
+    an = Analytics(results, get_test_dataset())
+
+    print("F1:", an.f1_score())
+

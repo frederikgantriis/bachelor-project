@@ -43,32 +43,39 @@ class NaiveBayes(MLAlgorithm):
                 self.loglikelihood[(word, c)] = math.log10(
                     (count + 1) / (n_words - count))
         self.sm.store_train_data()
-
-    def test(self, test_instance: str):
-        sum = {}
-        test_instance = utils.sanitize(test_instance)
-
+    
+    def test(self, test_dataset_text):
+        result = []
         for i in range(2):
-            try:
-                logprior, loglikelihood, _ = self.sm.load_train_data()
-                print("Found Naive Bayes training data!")
-                break
-            except FileNotFoundError:
-                # exit the program if FileNotFoundError happens more than once
-                if i == 1:
-                    print("ERROR: terminating...")
-                    exit()
-                print("Naive Bayes training data not found:\nInitializing training...")
-                self.train()
-
-        for c in self.classes:
-            sum[c] = logprior[c]
-            for word in test_instance:
                 try:
-                    sum[c] += loglikelihood[(word, c)]
-                except KeyError:
-                    continue
-        return utils.get_max_value_key(sum)
+                    logprior, loglikelihood, _ = self.sm.load_train_data()
+                    print("Found Naive Bayes training data!")
+                    break
+                except FileNotFoundError:
+                    # exit the program if FileNotFoundError happens more than once
+                    if i == 1:
+                        print("ERROR: terminating...")
+                        exit()
+                    print("Naive Bayes training data not found:\nInitializing training...")
+                    self.train()
+
+        def find_class(test_instance: str):
+            sum = {}
+            test_instance = utils.sanitize(test_instance)
+
+            for c in self.classes:
+                sum[c] = logprior[c]
+                for word in test_instance:
+                    try:
+                        sum[c] += loglikelihood[(word, c)]
+                    except KeyError:
+                        continue
+            return utils.get_max_value_key(sum)
+        
+        for test in test_dataset_text:
+            result.append(find_class(test))
+
+        return result
 
 
 def count_words(words: dict, vocabulary: list):

@@ -4,7 +4,7 @@ class Analytics(object):
     def __init__(self, result_labels: list, dataset: DatasetDict) -> None:
         self.result_labels = result_labels
         self.dataset = dataset
-        self.dataset_labels = dataset["labels"]
+        self.dataset_labels = dataset["label"]
         
 
     def f1_score(self) -> int:
