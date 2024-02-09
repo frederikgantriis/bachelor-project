@@ -12,9 +12,6 @@ class NaiveBayes(MlAlgorithm):
         self.logprior = {}
         self.loglikelihood = {}
 
-        # set of unique classes in the dataset (i.e in our case "OFF" & "NOT")
-        self.classes = set(dataset["label"])
-
         # amount of documents aka. comments/sentences in the dataset
         self.n_documents = len(dataset["text"])
 

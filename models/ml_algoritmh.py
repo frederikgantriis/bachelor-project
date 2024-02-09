@@ -4,6 +4,8 @@ from datasets import DatasetDict
 class MlAlgorithm(object):
     def __init__(self, dataset: DatasetDict) -> None:
         self.dataset = dataset
+        # set of unique classes in the dataset (i.e in our case "OFF" & "NOT")
+        self.classes = set(dataset["label"])
 
     def train(self):
         """train the model and store the results"""
