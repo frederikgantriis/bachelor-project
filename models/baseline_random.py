@@ -1,9 +1,9 @@
 import random
-from models.utils import get_labels
+import utils
 
 
 def test(comments):
-    labels = get_labels()
+    labels = utils.get_labels()
 
     answer = []
 

@@ -12,9 +12,6 @@ def sanitize(line):
     return re.findall(r'[a-øA-Ø0-9-]+|[^a-zæøåA-ZÆØÅ0-9\s]+', line)
 
 
-print(sanitize("Ikea-aber"))
-
-
 def extract_sentences_from_label(dataset: DatasetDict, label: str):
     extracted_sentences = []
 
@@ -38,6 +35,26 @@ def extract_words_from_label(dataset: DatasetDict, label: str):
                 extracted_words[word] += 1
 
     return extracted_words
+
+
+def get_max_value_key(d: dict):
+    max_value = max(d.values())
+
+    for key in d.keys():
+        if d[key] == max_value:
+            return key
+
+
+def flatten(matrix: list) -> list:
+    """flattens a matrix into a list
+
+    Args:
+        lst (list): 2d list
+
+    Returns:
+        list: 1d list
+    """
+    return [item for row in matrix for item in row]
 
 
 def sanitize_all_lower(line):

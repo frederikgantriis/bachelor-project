@@ -1,4 +1,4 @@
-from models.utils import sanitize, extract_words_from_label
+import utils
 from datasets import DatasetDict
 import math
 import pickle
@@ -16,7 +16,6 @@ def train(dataset: DatasetDict):
     for c in classes:
         n_classes = dataset["label"].count(c)
         logprior[c] = math.log10(n_classes / n_documents)
-        # bigdoc[c] = extract_sentences_from_label(dataset, c)
         print("extracting words...")
         bigwords = extract_words_from_label(dataset, c)
         n_words = count_words(bigwords, vocabulary)
@@ -46,25 +45,8 @@ def test(testdoc, logprior, loglikelihood, classes, vocabulary):
     print(sum)
 
 
-def count_words(words: dict, vocabulary: list):
-    sum = 0
-    for word in vocabulary:
-        if word in words:
-            sum += (words[word] + 1)
-        else:
-            sum += 1
-
-    return sum
-
-
 def store_train_data(logprior: dict, loglikelihood: dict, vocabulary: list):
-    """Stores the trained data in the computed_data/ folder (fails if the folder doesn't exist)
 
-    Args:
-        logprior (dict): the logprior dict returned after training the model (the train() method)
-        loglikelihood (dict): the loglikelihood dict returned after training the model (the train() method)
-        vocabulary (list): list of all words in all classes (i.e all words in the dataset)
-    """
     with open('computed_data/nb_lp.pkl', 'wb') as f:
         pickle.dump(logprior, f)
     with open('computed_data/nb_ll.pkl', 'wb') as f:
@@ -93,5 +75,5 @@ def main(dataset: DatasetDict):
     # store_train_data(lp, ll, v)
 
     lp, ll, v = load_train_data()
-    test(sanitize("Ikea-aber"),
+    test(sanitize("hej med dig"),
          lp, ll, set(dataset["label"]), v)

@@ -1,5 +1,6 @@
 from data_parser import get_test_comments, get_test_labels, get_train
-from models import baseline_random, naive_bayes
+from models import baseline_random
+from models.naive_bayes_cl import NaiveBayes
 
 
 def test_random():
@@ -29,4 +30,8 @@ def compare_with_test_data(results):
 
 
 if __name__ == "__main__":
-    naive_bayes.main(get_train())
+    nb = NaiveBayes(get_train())
+    print("train nb")
+    nb.train()
+    print("test nb")
+    print(nb.test("hej med dig"))
