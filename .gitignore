@@ -3,5 +3,4 @@ env/
 .env
 data/
 __pycache__
-computed_data/
 storage_manager_data/
