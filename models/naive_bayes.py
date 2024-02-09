@@ -2,11 +2,11 @@ import math
 import utils
 
 from datasets import DatasetDict
-from models.ml_algoritmh import MlAlgorithm
+from models.ml_algoritmh import MLAlgorithm
 from storage_manager import StorageManager
 
 
-class NaiveBayes(MlAlgorithm):
+class NaiveBayes(MLAlgorithm):
     def __init__(self, dataset: DatasetDict) -> None:
         super().__init__(dataset)
         # base chance based on the split in classes in the dataset
@@ -15,7 +15,7 @@ class NaiveBayes(MlAlgorithm):
         self.loglikelihood = {}
 
         # amount of documents aka. comments/sentences in the dataset
-        self.n_documents = len(dataset["text"])
+        self.n_instances = len(dataset["text"])
 
         # creates a list of all words in the dataset after sentences have been sanitized
         self.vocabulary = utils.flatten([utils.sanitize(comment)
@@ -29,7 +29,7 @@ class NaiveBayes(MlAlgorithm):
             # amount of instances with this class
             n_classes = self.dataset["label"].count(c)
             # it gives a base chance for it being NOT or OFF based on the split in the dataset
-            self.logprior[c] = math.log10(n_classes / self.n_documents)
+            self.logprior[c] = math.log10(n_classes / self.n_instances)
 
             words_in_class = utils.extract_words_from_label(self.dataset, c)
             n_words = count_words(words_in_class, self.vocabulary)
@@ -44,9 +44,9 @@ class NaiveBayes(MlAlgorithm):
                     (count + 1) / (n_words - count))
         self.sm.store_train_data()
 
-    def test(self, testdoc: str):
+    def test(self, test_instance: str):
         sum = {}
-        testdoc = utils.sanitize(testdoc)
+        test_instance = utils.sanitize(test_instance)
 
         for i in range(2):
             try:
@@ -54,6 +54,7 @@ class NaiveBayes(MlAlgorithm):
                 print("Found Naive Bayes training data!")
                 break
             except FileNotFoundError:
+                # exit the program if FileNotFoundError happens more than once
                 if i == 1:
                     print("ERROR: terminating...")
                     exit()
@@ -62,7 +63,7 @@ class NaiveBayes(MlAlgorithm):
 
         for c in self.classes:
             sum[c] = logprior[c]
-            for word in testdoc:
+            for word in test_instance:
                 try:
                     sum[c] += loglikelihood[(word, c)]
                 except KeyError:
