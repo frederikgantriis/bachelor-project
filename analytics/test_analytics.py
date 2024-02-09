@@ -1,4 +1,4 @@
-from analytics.analyse import Analytics
+from analyse import Analytics
 from constants import NOT, OFF
 
 
