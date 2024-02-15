@@ -59,23 +59,23 @@ class NaiveBayes(MLAlgorithm):
                 print("Naive Bayes training data not found:\nInitializing training...")
                 self.train()
 
-        def find_class(test_instance: str):
-            sum = {}
-            test_instance = utils.sanitize(test_instance)
-
-            for c in self.classes:
-                sum[c] = logprior[c]
-                for word in test_instance:
-                    try:
-                        sum[c] += loglikelihood[(word, c)]
-                    except KeyError:
-                        continue
-            return utils.get_max_value_key(sum)
-
         for test in test_dataset_text:
-            result.append(find_class(test))
-
+            result.append(find_class(test, self.classes,
+                          logprior=logprior, loglikelihood=loglikelihood))
         return result
+
+
+def find_class(test_instance: str, classes: list, logprior: dict, loglikelihood: dict):
+    sum = {}
+    test_instance = utils.sanitize(test_instance)
+    for c in classes:
+        sum[c] = logprior[c]
+        for word in test_instance:
+            try:
+                sum[c] += loglikelihood[(word, c)]
+            except KeyError:
+                continue
+    return utils.get_max_value_key(sum)
 
 
 def count_words(words: dict, vocabulary: list):
@@ -85,5 +85,4 @@ def count_words(words: dict, vocabulary: list):
             sum += (words[word] + 1)
         else:
             sum += 1
-
     return sum
