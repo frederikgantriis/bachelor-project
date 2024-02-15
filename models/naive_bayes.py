@@ -42,13 +42,13 @@ class NaiveBayes(MLAlgorithm):
                 # words used in the class.
                 self.loglikelihood[(word, c)] = math.log10(
                     (count + 1) / (n_words - count))
-        self.sm.store_train_data()
+        self.sm.store_data()
 
     def test(self, test_dataset_text):
         result = []
         for i in range(2):
             try:
-                logprior, loglikelihood, _ = self.sm.load_train_data()
+                logprior, loglikelihood, _ = self.sm.load_data()
                 print("Found Naive Bayes training data!")
                 break
             except FileNotFoundError:
