@@ -22,7 +22,7 @@ class NaiveBayes(MLAlgorithm):
                                          for comment in self.dataset["text"]])
 
         self.sm = StorageManager(
-            "nb_data", (self.logprior, self.loglikelihood, self.vocabulary))
+            "nb_data", 'train', (self.logprior, self.loglikelihood, self.vocabulary))
 
     def train(self):
         for c in self.classes:
@@ -43,21 +43,21 @@ class NaiveBayes(MLAlgorithm):
                 self.loglikelihood[(word, c)] = math.log10(
                     (count + 1) / (n_words - count))
         self.sm.store_train_data()
-    
+
     def test(self, test_dataset_text):
         result = []
         for i in range(2):
-                try:
-                    logprior, loglikelihood, _ = self.sm.load_train_data()
-                    print("Found Naive Bayes training data!")
-                    break
-                except FileNotFoundError:
-                    # exit the program if FileNotFoundError happens more than once
-                    if i == 1:
-                        print("ERROR: terminating...")
-                        exit()
-                    print("Naive Bayes training data not found:\nInitializing training...")
-                    self.train()
+            try:
+                logprior, loglikelihood, _ = self.sm.load_train_data()
+                print("Found Naive Bayes training data!")
+                break
+            except FileNotFoundError:
+                # exit the program if FileNotFoundError happens more than once
+                if i == 1:
+                    print("ERROR: terminating...")
+                    exit()
+                print("Naive Bayes training data not found:\nInitializing training...")
+                self.train()
 
         def find_class(test_instance: str):
             sum = {}
@@ -71,7 +71,7 @@ class NaiveBayes(MLAlgorithm):
                     except KeyError:
                         continue
             return utils.get_max_value_key(sum)
-        
+
         for test in test_dataset_text:
             result.append(find_class(test))
 
