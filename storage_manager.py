@@ -12,19 +12,17 @@ class StorageManager(object):
         self.key = key
         self.data_type = data_type
 
-        if data_type != 'train' and data_type != 'test':
-            raise ValueError(
-                'data_type argument must be either "train" or "test')
-
-        # TODO: change test data extension to correct type
-        self.ext = '.pkl' if data_type == 'train' else '.json'
+        if data_type != "train" and data_type != "test":
+            raise ValueError('data_type argument must be either "train" or "test')
 
     def store_data(self):
         """store data in storage_manager_data/<data_type>/<key>.<file_extension>"""
         if not os.path.exists("storage_manager_data/" + self.data_type):
             os.makedirs("storage_manager_data/" + self.data_type)
 
-        with open('storage_manager_data/' + self.data_type + '/' + self.key + self.ext, 'wb') as f:
+        with open(
+            "storage_manager_data/" + self.data_type + "/" + self.key + ".pkl", "wb"
+        ) as f:
             pickle.dump(self.data, f)
 
     def load_data(self):
@@ -32,5 +30,7 @@ class StorageManager(object):
 
         raises FileNotFoundError
         """
-        with open('storage_manager_data/' + self.data_type + '/' + self.key + self.ext, 'rb') as f:
+        with open(
+            "storage_manager_data/" + self.data_type + "/" + self.key + ".pkl", "rb"
+        ) as f:
             return pickle.load(f)
