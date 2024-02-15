@@ -19,7 +19,7 @@ class StorageManager(object):
         # TODO: change test data extension to correct type
         self.ext = '.pkl' if data_type == 'train' else '.json'
 
-    def store_train_data(self):
+    def store_data(self):
         """store data in storage_manager_data/<data_type>/<key>.<file_extension>"""
         if not os.path.exists("storage_manager_data/" + self.data_type):
             os.makedirs("storage_manager_data/" + self.data_type)
@@ -27,7 +27,7 @@ class StorageManager(object):
         with open('storage_manager_data/' + self.data_type + '/' + self.key + self.ext, 'wb') as f:
             pickle.dump(self.data, f)
 
-    def load_train_data(self):
+    def load_data(self):
         """loads and returns data
 
         raises FileNotFoundError
