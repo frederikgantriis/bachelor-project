@@ -1,0 +1,8 @@
+[run]
+omit = 
+    conftest.py
+    data_parser.py
+    run.py
+    /env/*
+    */pycache/*
+    /data/*
