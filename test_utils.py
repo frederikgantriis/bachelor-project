@@ -14,10 +14,10 @@ def test_extract_sentences_from_label():
 
 
 def test_extract_words_from_label():
-    dataset = {"text": ["Hei, jeg heter Ola Nordmann.",
+    dataset = {"text": ["Hei, jeg heter Ola Nordmann. Hei",
                         "Hei, jeg heter Kari Nordmann."], "label": ["OFF", "NOT"]}
     assert utils.extract_words_from_label(dataset, "OFF") == {
-        "Hei": 1, ",": 1, "jeg": 1, "heter": 1, "Ola": 1, "Nordmann": 1, ".": 1}
+        "Hei": 2, ",": 1, "jeg": 1, "heter": 1, "Ola": 1, "Nordmann": 1, ".": 1}
 
 
 def test_get_max_value_key():
