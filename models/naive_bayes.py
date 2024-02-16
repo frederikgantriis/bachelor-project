@@ -2,8 +2,9 @@ import math
 import utils
 
 from datasets import DatasetDict
-from models.ml_algoritmh import MLAlgorithm
+from models.ml_algorithm import MLAlgorithm
 from storage_manager import StorageManager
+from data import TrainData
 
 
 class NaiveBayes(MLAlgorithm):
@@ -22,9 +23,7 @@ class NaiveBayes(MLAlgorithm):
             [utils.sanitize(comment) for comment in self.dataset["text"]]
         )
 
-        self.sm = StorageManager(
-            "nb_data", "train", (self.logprior, self.loglikelihood, self.vocabulary)
-        )
+        self.sm = StorageManager()
 
     def train(self):
         c: str
@@ -44,9 +43,9 @@ class NaiveBayes(MLAlgorithm):
                 # the amount of the word used in the class compared to the total amount of
                 # words used in the class.
                 self.loglikelihood[(word, c)] = math.log10(
-                    (count + 1) / (n_words - count)
-                )
-        self.sm.store_data()
+                    (count + 1) / (n_words - count))
+        self.sm.store_data(
+            TrainData(str(self), (self.logprior, self.loglikelihood, self.vocabulary)))
 
     def test(self, test_dataset_text):
         result = []
@@ -55,7 +54,8 @@ class NaiveBayes(MLAlgorithm):
 
         for i in range(2):
             try:
-                logprior, loglikelihood, _ = self.sm.load_data()
+                logprior, loglikelihood, _ = self.sm.load_data(
+                    str(self), "train")
                 print("Found Naive Bayes training data!")
                 break
             except FileNotFoundError:
@@ -76,6 +76,9 @@ class NaiveBayes(MLAlgorithm):
                 )
             )
         return result
+
+    def __str__(self) -> str:
+        return "naive-bayes"
 
 
 def find_class(test_instance: str, classes: list, logprior: dict, loglikelihood: dict):

@@ -1,5 +1,5 @@
-from analyse import Analytics
-from constants import NOT, OFF
+from analytics.analytics import Analyzer
+from analytics.constants import NOT, OFF
 from datasets import DatasetDict
 
 
@@ -12,11 +12,11 @@ False Negative: 1
 """
 test_result = [NOT, OFF, NOT, OFF, OFF, OFF]
 
-test_dataset: DatasetDict = DatasetDict()
+test_dataset = {}
 
 test_dataset["label"] = [NOT, OFF, OFF, NOT, OFF, NOT]
 
-test_analytics = Analytics(test_result, test_dataset)
+test_analytics = Analyzer(test_result, test_dataset)
 
 
 def test_calculate_true_positives():

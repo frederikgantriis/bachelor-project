@@ -14,3 +14,6 @@ class MLAlgorithm(object):
     def test(self, test_dataset_text: list):
         """run the test and return the result"""
         raise NotImplementedError("This has not been implemented yet")
+
+    def __str__(self) -> str:
+        raise NotImplementedError("This has not been implemented yet")
