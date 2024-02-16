@@ -1,4 +1,4 @@
-from analytics import Analyzer, compare_test_results
+from analytics import Analyzer
 from constants import NOT, OFF
 from pandas import DataFrame
 
