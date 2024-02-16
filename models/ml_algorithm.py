@@ -1,7 +1,7 @@
 from datasets import DatasetDict
 
 
-class MLAlgorithm(object):
+class MLAlgorithm(object):  # pragma: no cover
     def __init__(self, dataset: DatasetDict) -> None:
         self.dataset = dataset
         # set of unique classes in the dataset (i.e in our case "OFF" & "NOT")

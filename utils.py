@@ -6,6 +6,10 @@ def sanitize(line):
     return re.findall(r'[a-øA-Ø0-9-]+|[^a-zæøåA-ZÆØÅ0-9\s]+', line)
 
 
+def sanitize_all_lower(line):
+    return [x.lower() for x in sanitize(line)]
+
+
 def extract_sentences_from_label(dataset: DatasetDict, label: str):
     extracted_sentences = []
 
@@ -49,12 +53,3 @@ def flatten(matrix: list) -> list:
         list: 1d list
     """
     return [item for row in matrix for item in row]
-
-
-def sanitize_all_lower(line):
-    words = sanitize(line)
-
-    for word in words:
-        word = word.toLower()
-
-    return words
