@@ -8,9 +8,9 @@ class BaselineRandom(MLAlgorithm):
     def __init__(self, dataset: DatasetDict) -> None:
         super().__init__(dataset)
         self.classes: list = list(set(self.dataset["label"]))
-        self.comments: Dataset  = dataset["text"]
+        self.comments: Dataset = dataset["text"]
 
-    def test(self, test_dataset_text: list):
+    def test(self, test_dataset_text: list | None):
         answer = []
 
         for _ in range(len(self.comments)):
