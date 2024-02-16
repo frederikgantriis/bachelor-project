@@ -1,61 +1,65 @@
 import pickle
 import os
-from data import Data, TrainData, TestData
+from data import Data, TrainData, StatsData
 import pandas
 
 
 class StorageManager(object):
-    """Stores and loads your train and test data.
-    data_type: must be either 'train' or 'test
-    """
+    """Stores and loads your train and stats data."""
 
-    def __init__(self, data: Data) -> None:
-        if not isinstance(data, Data):
-            raise ValueError("data must be either TrainData or TestData")
+    def __init__(self) -> None:
+        pass
 
-        self.data = data
-        self.data_type = "train" if isinstance(data, TrainData) else "test"
+    def store_data(self, data: Data):
+        """Stores data in a file
 
-    def store_data(self):
-        """store data in storage_manager_data/<data_type>/<key>.<file_extension>"""
-        if isinstance(self.data, TrainData):
-            store_train_data(self.data)
-            return
-
-        store_test_data(self.data)
-
-    def load_data(self):
-        """loads and returns data
-
-        raises FileNotFoundError
+        Args:
+            data (Data): data to store
         """
-        # with open(
-        #     "storage_manager_data/" + self.data_type + "/" + self.key + ".pkl", "rb"
-        # ) as f:
-        #     return pickle.load(f)
-        return load_test_data(self.data)
+        store_train_data(data) if isinstance(
+            data, TrainData) else store_test_data(data)
+
+    def load_data(self, model_name: str, data_type: str):
+        """loads data from file
+
+        Args:
+            model_name (str): name of model to load data from
+            data_type (str): must be either 'train' or 'stats'
+        """
+        if data_type != "train" and data_type != "stats":
+            raise ValueError(
+                "data_type must be either 'train' or 'stats', but was " + data_type)
+
+        return load_train_data(model_name) if data_type == "train" else load_stats_data(model_name)
 
 
 def store_train_data(data: TrainData):
-    if not os.path.exists("storage_manager_data/" + self.data_type):
-        os.makedirs("storage_manager_data/" + self.data_type)
-
-    with open(
-        "storage_manager_data/" + self.data_type + "/" + self.key + ".pkl", "wb"
-    ) as f:
-        pickle.dump(self.data, f)
+    folder_path = "data/models/train"
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+    with open(folder_path + "/" + data.model_name + ".pkl", "wb") as f:
+        pickle.dump(data.data, f)
 
 
-def store_test_data(data: TestData):
+def store_test_data(data: StatsData):
+    folder_path = "data/models/stats"
     data_frame: pandas.DataFrame = data.as_data_frame()
-    if os.path.exists("data/" + data.model_name + ".csv"):
+    if os.path.exists(folder_path + "/" + data.model_name + ".csv"):
         # append to existing file
-        data_frame.to_csv("data/" + data.model_name +
+        data_frame.to_csv(folder_path + "/" + data.model_name +
                           ".csv", mode="a", header=False)
-        return
+    else:
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+        data_frame.to_csv(folder_path + "/" + data.model_name + ".csv")
 
-    data_frame.to_csv("data/" + data.model_name + ".csv")
+
+def load_train_data(file_name: str):
+    folder_path = "data/models/train"
+    with open(folder_path + "/" + file_name + ".pkl", "rb") as f:
+        return pickle.load(f)
 
 
-def load_test_data(data: TestData):
-    return pandas.read_csv("data/" + data.model_name + ".csv")
+def load_stats_data(file_name: str):
+    folder_path = "data/models/stats"
+    return pandas.read_csv(folder_path + "/" + file_name + ".csv")

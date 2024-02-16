@@ -1,3 +1,0 @@
-,model_name,f1,accuracy,precision,recall,true_positives,false_positives,true_negatives,false_negatives,timestamp
-0,test,0.5,0.5,0.5,0.5,0,0,0,0,2024-02-16 10:01:19.401620
-0,test,0.5,0.5,0.5,0.5,0,0,0,0,2024-02-16 10:01:21.794420

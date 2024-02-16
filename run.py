@@ -2,18 +2,22 @@ from data_parser import get_train_dataset, get_test_dataset
 from models.baseline_random import BaselineRandom
 from models.naive_bayes import NaiveBayes
 from analytics.analyse import Analytics
-from data import TestData, TrainData
+from data import StatsData, TrainData
 from storage_manager import StorageManager
 
 if __name__ == "__main__":
-    # nb = NaiveBayes(get_train_dataset())
-    # nb.train()
-    # print(nb.test())
-    test = TestData("test", 0.5, 0.5, 0.5, 0.5, 0, 0, 0, 0)
+    # Storage manager example
+    sm = StorageManager()
 
-    sm = StorageManager(test)
-    sm.store_data()
-    print(sm.load_data())
+    nb = NaiveBayes(get_train_dataset())
+
+    nb.test(get_test_dataset()["text"])
+    nb_training_data = sm.load_data(str(nb), "train")
+
+    nb_stats_data = sm.store_data(
+        StatsData(str(nb), 0.5, 0, 5, 0.5, 0, 0, 0, 0)),
+
+    print(sm.load_data(str(nb), "stats"))
 
     # bs_random = BaselineRandom(get_test_dataset())
 

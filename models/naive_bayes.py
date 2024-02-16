@@ -22,8 +22,7 @@ class NaiveBayes(MLAlgorithm):
         self.vocabulary = utils.flatten([utils.sanitize(comment)
                                          for comment in self.dataset["text"]])
 
-        self.sm = StorageManager(
-            TrainData(str(self), (self.logprior, self.loglikelihood, self.vocabulary)))
+        self.sm = StorageManager()
 
     def train(self):
         for c in self.classes:
@@ -43,13 +42,15 @@ class NaiveBayes(MLAlgorithm):
                 # words used in the class.
                 self.loglikelihood[(word, c)] = math.log10(
                     (count + 1) / (n_words - count))
-        self.sm.store_data()
+        self.sm.store_data(
+            TrainData(str(self), (self.logprior, self.loglikelihood, self.vocabulary)))
 
     def test(self, test_dataset_text):
         result = []
         for i in range(2):
             try:
-                logprior, loglikelihood, _ = self.sm.load_data()
+                logprior, loglikelihood, _ = self.sm.load_data(
+                    str(self), "train")
                 print("Found Naive Bayes training data!")
                 break
             except FileNotFoundError:
