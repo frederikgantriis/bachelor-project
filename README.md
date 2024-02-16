@@ -57,8 +57,8 @@ Here are the commands for testing the project
     pytest
     ```
 1. For getting the test coverage
-    ```sh 
-    pytest --cov=. --cov-fail-under=90
+    ```sh
+    pytest --cov=. --cov-fail-under=90 --cov-report term-missing
     ```
 
 
