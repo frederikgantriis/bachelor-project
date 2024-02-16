@@ -10,6 +10,9 @@ class BaselineRandom(MLAlgorithm):
         self.classes: list = list(set(self.dataset["label"]))
         self.comments: Dataset = dataset["text"]
 
+    def train(self):
+        pass
+
     def test(self, test_dataset_text: list | None):
         answer = []
 
@@ -17,3 +20,6 @@ class BaselineRandom(MLAlgorithm):
             answer.append(random.choice(self.classes))
 
         return answer
+
+    def __str__(self):
+        return "Baseline Random"

@@ -1,8 +1,8 @@
 from data_parser import get_train_dataset, get_test_dataset
 from models.baseline_random import BaselineRandom
 from models.naive_bayes import NaiveBayes
-from analytics.analytics import Analyzer
 from data import StatsData, TrainData
+from analytics.analytics import Analyzer, compare_test_results
 from storage_manager import StorageManager
 
 if __name__ == "__main__":
@@ -17,7 +17,7 @@ if __name__ == "__main__":
     nb_stats_data = sm.store_data(
         StatsData(str(nb), 0.5, 0, 5, 0.5, 0, 0, 0, 0)),
 
-    print(sm.load_data(str(nb), "stats"))
+    # print(sm.load_data(str(nb), "stats"))
 
     # bs_random = BaselineRandom(get_test_dataset())
 
@@ -30,3 +30,5 @@ if __name__ == "__main__":
     # an = Analytics(results, get_test_dataset())
 
     # print("F1:", an.f1_score())
+
+    print(compare_test_results())

@@ -1,11 +1,16 @@
 from datasets import DatasetDict
+from models.naive_bayes import NaiveBayes
+from models.baseline_random import BaselineRandom
+from pandas import concat
+from data import StatsData
+from data_parser import get_test_dataset, get_train_dataset
+
 
 class Analyzer(object):
     def __init__(self, result_labels: list, dataset: DatasetDict) -> None:
         self.result_labels = result_labels
         self.dataset = dataset
         self.dataset_labels = dataset["label"]
-        
 
     def f1_score(self) -> float:
         """Get the f1_score based labels from model and labels from the test dataset
@@ -27,8 +32,9 @@ class Analyzer(object):
         false_positives = self.calculate_false_positives()
         false_negatives = self.calculate_false_negatives()
 
-        return (2 * true_positives) / ((2 * true_positives) + false_positives + false_negatives)
-
+        return (2 * true_positives) / (
+            (2 * true_positives) + false_positives + false_negatives
+        )
 
     def calculate_precision(self):
 
@@ -36,30 +42,31 @@ class Analyzer(object):
 
         return true_positives / (true_positives + self.calculate_true_negatives())
 
-
     def calculate_recall(self):
         true_positives = self.calculate_true_positives()
 
         return true_positives / (true_positives + self.calculate_false_negatives())
 
+    def calculate_accuracy(self):
+        return (
+            self.calculate_true_positives() + self.calculate_true_negatives()
+        ) / len(self.dataset_labels)
 
     def calculate_false_positives(self):
         return self.count_true_labels("OFF", "NOT")
 
-
     def calculate_false_negatives(self):
         return self.count_true_labels("NOT", "OFF")
-
 
     def calculate_true_positives(self):
         return self.count_true_labels("OFF", "OFF")
 
-
     def calculate_true_negatives(self):
         return self.count_true_labels("NOT", "NOT")
 
-
-    def count_true_labels(self, compare_result_label: str, compare_test_label: str) -> int:
+    def count_true_labels(
+        self, compare_result_label: str, compare_test_label: str
+    ) -> int:
         """counts amount of labels from model and test dataset, with a given compare_label
 
         Parameters
@@ -77,7 +84,41 @@ class Analyzer(object):
         counter = 0
 
         for i in range(len(self.result_labels)):
-            if self.result_labels[i] == compare_result_label and self.dataset_labels[i] == compare_test_label:
+            if (
+                self.result_labels[i] == compare_result_label
+                and self.dataset_labels[i] == compare_test_label
+            ):
                 counter += 1
 
         return counter
+
+
+def compare_test_results():
+    models = [NaiveBayes(get_train_dataset()), BaselineRandom(get_test_dataset())]
+
+    data_frame = None
+
+    for model in models:
+
+        model_analyzer = Analyzer(
+            model.test(get_test_dataset()["text"]), get_test_dataset()
+        )
+
+        model_data = StatsData(
+            str(model),
+            model_analyzer.f1_score(),
+            model_analyzer.calculate_accuracy(),
+            model_analyzer.calculate_precision(),
+            model_analyzer.calculate_recall(),
+            model_analyzer.calculate_true_positives(),
+            model_analyzer.calculate_false_positives(),
+            model_analyzer.calculate_false_negatives(),
+            model_analyzer.calculate_true_negatives(),
+        )
+
+        if data_frame is None:
+            data_frame = model_data.as_data_frame()
+        else:
+            data_frame = concat([data_frame, model_data.as_data_frame()], ignore_index=True)
+
+    return data_frame
