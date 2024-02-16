@@ -1,6 +1,7 @@
 import random
 
 from datasets import DatasetDict, Dataset
+import pytest
 from models.ml_algorithm import MLAlgorithm
 
 
@@ -10,7 +11,7 @@ class BaselineRandom(MLAlgorithm):
         self.classes: list = list(set(self.dataset["label"]))
         self.comments: Dataset = dataset["text"]
 
-    def train(self):
+    def train(self): # pragma: no cover
         pass
 
     def test(self, test_dataset_text: list | None):
