@@ -1,6 +1,6 @@
 from datasets import DatasetDict
-from models.naive_bayes import NaiveBayes # pragma: no cover
-from models.baseline_random import BaselineRandom # pragma: no cover
+from models.naive_bayes import NaiveBayes
+from models.baseline_random import BaselineRandom 
 from pandas import concat
 from data import StatsData
 from data_parser import get_test_dataset, get_train_dataset
