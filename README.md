@@ -47,3 +47,19 @@ This is only needed if packages needs to be synced with e.g. collaborators or yo
     ```sh
     pip install -r requirements.txt
     ```
+
+### Test project
+
+Here are the commands for testing the project
+
+1. For running basic test
+    ```sh
+    pytest
+    ```
+1. For getting the test coverage
+    ```sh 
+    pytest --cov=. --cov-fail-under=90
+    ```
+
+
+
