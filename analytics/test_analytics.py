@@ -1,7 +1,5 @@
-from analytics.analytics import Analyzer
-from analytics.constants import NOT, OFF
-from datasets import DatasetDict
-
+from analytics import Analyzer
+from constants import NOT, OFF
 
 """
 This test_case should generate:
