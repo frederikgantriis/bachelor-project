@@ -15,6 +15,5 @@ class MLAlgorithm(object):
         """run the test and return the result"""
         raise NotImplementedError("This has not been implemented yet")
 
-    def to_string(self):
-        """return the name of the model"""
-        raise NotImplementedError("This has not been implemented yet")
+    def __str__(self) -> str:
+        pass
