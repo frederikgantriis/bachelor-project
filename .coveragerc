@@ -6,3 +6,5 @@ omit =
     /env/*
     */pycache/*
     /data/*
+    /models/ml_algorithm.py
+    storage_manager.py

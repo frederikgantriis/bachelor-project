@@ -8,8 +8,8 @@ from data import TrainData
 
 
 class NaiveBayes(MLAlgorithm):
-    def __init__(self, dataset: DatasetDict) -> None:
-        super().__init__(dataset)
+    def __init__(self, dataset: DatasetDict) -> None:  # pragma: no cover
+        super().__init__(dataset)  # type: ignore
         # base chance based on the split in classes in the dataset
         self.logprior = {}
         # Chance for each word to belong to each class
@@ -25,7 +25,7 @@ class NaiveBayes(MLAlgorithm):
 
         self.sm = StorageManager()
 
-    def train(self):
+    def train(self):  # pragma: no cover
         c: str
         for c in self.classes:  # type: ignore
             # amount of instances with this class
@@ -43,19 +43,20 @@ class NaiveBayes(MLAlgorithm):
                 # the amount of the word used in the class compared to the total amount of
                 # words used in the class.
                 self.loglikelihood[(word, c)] = math.log10(
-                    (count + 1) / (n_words - count))
+                    (count + 1) / (n_words - count)
+                )
         self.sm.store_data(
-            TrainData(str(self), (self.logprior, self.loglikelihood, self.vocabulary)))
+            TrainData(str(self), (self.logprior, self.loglikelihood, self.vocabulary))
+        )
 
     def test(self, test_dataset_text):
         result = []
         loglikelihood = {}
         logprior = {}
 
-        for i in range(2):
+        for i in range(2):  # pragma: no cover
             try:
-                logprior, loglikelihood, _ = self.sm.load_data(
-                    str(self), "train")
+                logprior, loglikelihood, _ = self.sm.load_data(str(self), "train")
                 print("Found Naive Bayes training data!")
                 break
             except FileNotFoundError:

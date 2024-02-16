@@ -1,5 +1,6 @@
-from analytics import Analyzer
+from analytics import Analyzer, compare_test_results
 from constants import NOT, OFF
+from pandas import DataFrame
 
 """
 This test_case should generate:
@@ -43,3 +44,11 @@ def test_calculate_recall():
 
 def test_f1_score():
     assert test_analytics.f1_score() == 4 / 7
+
+
+def test_accuracy():
+    assert test_analytics.calculate_accuracy() == 3 / 6
+
+
+def test_compare_test_results():
+    isinstance(compare_test_results(), DataFrame)
