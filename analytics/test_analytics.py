@@ -1,4 +1,4 @@
-from analyse import Analytics
+from analytics.analytics import Analyzer
 from constants import NOT, OFF
 
 
@@ -15,7 +15,7 @@ test_dataset = {}
 
 test_dataset["label"] = [NOT, OFF, OFF, NOT, OFF, NOT]
 
-test_analytics = Analytics(test_result, test_dataset)
+test_analytics = Analyzer(test_result, test_dataset)
 
 
 def test_calculate_true_positives():

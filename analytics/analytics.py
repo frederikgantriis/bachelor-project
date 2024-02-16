@@ -1,6 +1,6 @@
 from datasets import DatasetDict
 
-class Analytics(object):
+class Analyzer(object):
     def __init__(self, result_labels: list, dataset: DatasetDict) -> None:
         self.result_labels = result_labels
         self.dataset = dataset

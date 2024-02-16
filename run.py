@@ -1,7 +1,7 @@
 from data_parser import get_train_dataset, get_test_dataset
 from models.baseline_random import BaselineRandom
 from models.naive_bayes import NaiveBayes
-from analytics.analyse import Analytics
+from analytics.analytics import Analyzer
 from data import TestData, TrainData
 from storage_manager import StorageManager
 
