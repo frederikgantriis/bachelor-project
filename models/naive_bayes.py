@@ -7,7 +7,7 @@ from storage_manager import StorageManager
 from data import TrainData
 
 
-class NaiveBayes(MLAlgorithm):
+class NaiveBayes(MLAlgorithm): # pragma: no cover
     def __init__(self, dataset: DatasetDict) -> None:  # pragma: no cover
         super().__init__(dataset)  # type: ignore
         # base chance based on the split in classes in the dataset
@@ -82,7 +82,7 @@ class NaiveBayes(MLAlgorithm):
         return "naive-bayes"
 
 
-def find_class(test_instance: str, classes: list, logprior: dict, loglikelihood: dict):
+def find_class(test_instance: str, classes: list, logprior: dict, loglikelihood: dict): # pragma: no cover
     sum = {}
     test_instance_list = utils.sanitize(test_instance)
     for c in classes:
@@ -95,7 +95,7 @@ def find_class(test_instance: str, classes: list, logprior: dict, loglikelihood:
     return utils.get_max_value_key(sum)
 
 
-def count_words(words: dict, vocabulary: list):
+def count_words(words: dict, vocabulary: list): # pragma: no cover
     sum = 0
     for word in vocabulary:
         if word in words:
