@@ -11,7 +11,7 @@ class MLAlgorithm(object):
         """train the model and store the results"""
         raise NotImplementedError("This has not been implemented yet")
 
-    def test(self):
+    def test(self, test_dataset_text: list):
         """run the test and return the result"""
         raise NotImplementedError("This has not been implemented yet")
 

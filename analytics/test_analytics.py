@@ -1,5 +1,6 @@
 from analyse import Analytics
 from constants import NOT, OFF
+from datasets import DatasetDict
 
 
 """
@@ -11,7 +12,7 @@ False Negative: 1
 """
 test_result = [NOT, OFF, NOT, OFF, OFF, OFF]
 
-test_dataset = {}
+test_dataset: DatasetDict = DatasetDict()
 
 test_dataset["label"] = [NOT, OFF, OFF, NOT, OFF, NOT]
 
