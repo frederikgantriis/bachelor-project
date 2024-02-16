@@ -93,7 +93,7 @@ class Analyzer(object):
         return counter
 
 
-def compare_test_results():
+def compare_test_results(): # pragma: no cover
     models = [NaiveBayes(get_train_dataset()), BaselineRandom(get_test_dataset())]
 
     data_frame = None
