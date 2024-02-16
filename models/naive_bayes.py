@@ -19,14 +19,15 @@ class NaiveBayes(MLAlgorithm):
         self.n_instances = len(dataset["text"])
 
         # creates a list of all words in the dataset after sentences have been sanitized
-        self.vocabulary = utils.flatten([utils.sanitize(comment)
-                                         for comment in self.dataset["text"]])
+        self.vocabulary = utils.flatten(
+            [utils.sanitize(comment) for comment in self.dataset["text"]]
+        )
 
-        self.sm = StorageManager(
-            TrainData(str(self), (self.logprior, self.loglikelihood, self.vocabulary)))
+        self.sm = StorageManager()
 
     def train(self):
-        for c in self.classes:
+        c: str
+        for c in self.classes:  # type: ignore
             # amount of instances with this class
             n_classes = self.dataset["label"].count(c)
             # it gives a base chance for it being NOT or OFF based on the split in the dataset
@@ -43,13 +44,18 @@ class NaiveBayes(MLAlgorithm):
                 # words used in the class.
                 self.loglikelihood[(word, c)] = math.log10(
                     (count + 1) / (n_words - count))
-        self.sm.store_data()
+        self.sm.store_data(
+            TrainData(str(self), (self.logprior, self.loglikelihood, self.vocabulary)))
 
     def test(self, test_dataset_text):
         result = []
+        loglikelihood = {}
+        logprior = {}
+
         for i in range(2):
             try:
-                logprior, loglikelihood, _ = self.sm.load_data()
+                logprior, loglikelihood, _ = self.sm.load_data(
+                    str(self), "train")
                 print("Found Naive Bayes training data!")
                 break
             except FileNotFoundError:
@@ -61,8 +67,14 @@ class NaiveBayes(MLAlgorithm):
                 self.train()
 
         for test in test_dataset_text:
-            result.append(find_class(test, self.classes,
-                          logprior=logprior, loglikelihood=loglikelihood))
+            result.append(
+                find_class(
+                    test,
+                    list(self.classes),
+                    logprior=logprior,
+                    loglikelihood=loglikelihood,
+                )
+            )
         return result
 
     def __str__(self) -> str:
@@ -71,10 +83,10 @@ class NaiveBayes(MLAlgorithm):
 
 def find_class(test_instance: str, classes: list, logprior: dict, loglikelihood: dict):
     sum = {}
-    test_instance = utils.sanitize(test_instance)
+    test_instance_list = utils.sanitize(test_instance)
     for c in classes:
         sum[c] = logprior[c]
-        for word in test_instance:
+        for word in test_instance_list:
             try:
                 sum[c] += loglikelihood[(word, c)]
             except KeyError:
@@ -86,7 +98,7 @@ def count_words(words: dict, vocabulary: list):
     sum = 0
     for word in vocabulary:
         if word in words:
-            sum += (words[word] + 1)
+            sum += words[word] + 1
         else:
             sum += 1
     return sum

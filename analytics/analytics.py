@@ -7,7 +7,7 @@ class Analyzer(object):
         self.dataset_labels = dataset["label"]
         
 
-    def f1_score(self) -> int:
+    def f1_score(self) -> float:
         """Get the f1_score based labels from model and labels from the test dataset
 
         f1 formula: 2tp / 2tp + fp + fn

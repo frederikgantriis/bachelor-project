@@ -8,7 +8,7 @@ class Data(object):
         self.timestamp = datetime.now()
 
 
-class TestData(Data):
+class StatsData(Data):
     def __init__(self, model_name: str, f1: float, accuracy: int, precision: float, recall: float, true_positives: int, false_positives: int, false_negatives: int, true_negatives: int) -> None:
         super().__init__(model_name)
         self.f1 = f1
