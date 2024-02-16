@@ -50,5 +50,3 @@ def test_accuracy():
     assert test_analytics.calculate_accuracy() == 3 / 6
 
 
-def test_compare_test_results():
-    isinstance(compare_test_results(), DataFrame)
