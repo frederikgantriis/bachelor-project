@@ -2,8 +2,9 @@ import math
 import utils
 
 from datasets import DatasetDict
-from models.ml_algoritmh import MLAlgorithm
+from models.ml_algorithm import MLAlgorithm
 from storage_manager import StorageManager
+from data import TrainData
 
 
 class NaiveBayes(MLAlgorithm):
@@ -22,7 +23,7 @@ class NaiveBayes(MLAlgorithm):
                                          for comment in self.dataset["text"]])
 
         self.sm = StorageManager(
-            "nb_data", 'train', (self.logprior, self.loglikelihood, self.vocabulary))
+            TrainData(str(self), (self.logprior, self.loglikelihood, self.vocabulary)))
 
     def train(self):
         for c in self.classes:
@@ -63,6 +64,9 @@ class NaiveBayes(MLAlgorithm):
             result.append(find_class(test, self.classes,
                           logprior=logprior, loglikelihood=loglikelihood))
         return result
+
+    def __str__(self) -> str:
+        return "naive-bayes"
 
 
 def find_class(test_instance: str, classes: list, logprior: dict, loglikelihood: dict):

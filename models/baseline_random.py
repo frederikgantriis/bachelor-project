@@ -1,7 +1,7 @@
 import random
 
 from datasets import DatasetDict
-from models.ml_algoritmh import MLAlgorithm
+from models.ml_algorithm import MLAlgorithm
 
 
 class BaselineRandom(MLAlgorithm):
