@@ -1,6 +1,6 @@
 from datasets import DatasetDict
 from models.naive_bayes import NaiveBayes
-from models.baseline_random import BaselineRandom 
+from models.baseline_random import BaselineRandom
 from pandas import concat
 from data import StatsData
 from data_parser import get_test_dataset, get_train_dataset
@@ -93,9 +93,7 @@ class Analyzer(object):
         return counter
 
 
-def compare_test_results(): # pragma: no cover
-    models = [NaiveBayes(get_train_dataset()), BaselineRandom(get_test_dataset())]
-
+def benchmark_models(models: list):  # pragma: no cover
     data_frame = None
 
     for model in models:
@@ -119,6 +117,7 @@ def compare_test_results(): # pragma: no cover
         if data_frame is None:
             data_frame = model_data.as_data_frame()
         else:
-            data_frame = concat([data_frame, model_data.as_data_frame()], ignore_index=True)
+            data_frame = concat(
+                [data_frame, model_data.as_data_frame()], ignore_index=True)
 
     return data_frame
