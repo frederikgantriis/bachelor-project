@@ -1,7 +1,5 @@
 import math
-import trace
 import pandas as pd
-import numpy as np
 
 from datasets import DatasetDict, Dataset
 from models.ml_algorithm import MLAlgorithm
@@ -22,11 +20,11 @@ class LogisticRegression(MLAlgorithm):
     def crossentropy_loss(self, guess, expected):
         return -(expected * math.log(guess) + (1-expected) * math.log(1-guess))
 
-    def gradident_descent(self, features, weights, guess, expected, trainingspeed):
-        new_weights = [((guess-expected)*feature)*(-trainingspeed)
+    def gradident_descent(self, features, weights, loss, trainingspeed):
+        new_weights = [(loss*feature)*(-trainingspeed)
                        for feature in features]
 
-        new_weights.append((guess-expected)*(-trainingspeed))
+        new_weights.append(loss*(-trainingspeed))
 
         result = [x + y for x, y in zip(weights, new_weights)]
 

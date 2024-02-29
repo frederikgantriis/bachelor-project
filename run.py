@@ -33,4 +33,4 @@ if __name__ == "__main__":
     print(benchmark_models([nb, BaselineRandom()]))
 
     lr = LogisticRegression(get_train_dataset())
-    print(lr.gradident_descent([3, 2], [0,0,0], lr.sigmoid(0), 1, 0.1))
+    print(lr.gradident_descent([3, 2], [0,0,0], lr.sigmoid(0) - 1, 0.1))
