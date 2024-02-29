@@ -2,11 +2,13 @@ import random
 
 from datasets import DatasetDict, Dataset
 import pytest
+from data_parser import get_test_dataset
 from models.ml_algorithm import MLAlgorithm
 
 
-class BaselineRandom(MLAlgorithm): # pragma: no cover
-    def __init__(self, dataset: DatasetDict) -> None:
+class BaselineRandom(MLAlgorithm):  # pragma: no cover
+    def __init__(self) -> None:
+        dataset = get_test_dataset()
         super().__init__(dataset)
         self.classes: list = list(set(self.dataset["label"]))
         self.comments: Dataset = dataset["text"]
