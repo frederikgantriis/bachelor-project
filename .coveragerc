@@ -3,8 +3,7 @@ omit =
     conftest.py
     data_parser.py
     run.py
+    storage_manager.py
     /env/*
     */pycache/*
     /data/*
-    /models/ml_algorithm.py
-    storage_manager.py
