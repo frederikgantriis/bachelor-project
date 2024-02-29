@@ -1,5 +1,6 @@
 import re
 from datasets import DatasetDict
+import spacy
 
 
 def sanitize(line):
@@ -55,3 +56,9 @@ def flatten(matrix: list) -> list:
         list: 1d list
     """
     return [item for row in matrix for item in row]
+
+
+def remove_stop_words(sentence: str) -> list[str]:
+    """removes most common words danish words from a string"""
+    nlp = spacy.load("da_core_news_sm")
+    return [x.text for x in nlp(sentence) if not x.is_stop]
