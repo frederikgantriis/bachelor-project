@@ -7,30 +7,9 @@ from storage_manager import StorageManager
 
 from models.logistic_regression import LogisticRegression
 
-if __name__ == "__main__":
-    # Storage manager example
-    sm = StorageManager()
-
-    nb = NaiveBayes(get_train_dataset())
-
-    nb.test(get_test_dataset()["text"])
-    nb_training_data = sm.load_data(str(nb), "train")
-
-    # print(sm.load_data(str(nb), "stats"))
-
-    # bs_random = BaselineRandom(get_test_dataset())
-
-    # baseResults = bs_random.test()
-    # anBS = Analytics(baseResults, get_test_dataset())
-    # results = nb.test(get_test_dataset()["text"])
-
-    # print("base f1:", anBS.f1_score())
-
-    # an = Analytics(results, get_test_dataset())
-
-    # print("F1:", an.f1_score())
-
-    print(benchmark_models([nb, BaselineRandom()]))
+if __name__ == "__main__":    
+    print(benchmark_models([NaiveBayes(get_train_dataset()), BaselineRandom()]))
 
     lr = LogisticRegression(get_train_dataset())
     print(lr.gradident_descent([3, 2], [0,0,0], lr.sigmoid(0) - 1, 0.1))
+    

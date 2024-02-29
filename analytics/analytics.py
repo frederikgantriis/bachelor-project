@@ -4,6 +4,7 @@ from models.baseline_random import BaselineRandom
 from pandas import concat
 from data import StatsData
 from data_parser import get_test_dataset, get_train_dataset
+from storage_manager import StorageManager
 
 
 class Analyzer(object):
@@ -94,7 +95,18 @@ class Analyzer(object):
 
 
 def benchmark_models(models: list):  # pragma: no cover
+    """tests each model, saves the result to data/models/stats and returns a data-frame containing all test-results
+
+    Args:
+        models (list): list of all the models
+
+    Returns:
+        DataFrame: A DataFrame containing all the test-results from the different models
+    """
+
     data_frame = None
+
+    sm = StorageManager()
 
     for model in models:
 
@@ -118,6 +130,9 @@ def benchmark_models(models: list):  # pragma: no cover
             data_frame = model_data.as_data_frame()
         else:
             data_frame = concat(
-                [data_frame, model_data.as_data_frame()], ignore_index=True)
+                [data_frame, model_data.as_data_frame()], ignore_index=True
+            )
+
+        sm.store_data(model_data)
 
     return data_frame
