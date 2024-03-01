@@ -1,10 +1,7 @@
 from datasets import DatasetDict
-from models.naive_bayes import NaiveBayes
-from models.baseline_random import BaselineRandom
 from pandas import concat
 from data import StatsData
-from data_parser import get_test_dataset, get_train_dataset
-from storage_manager import StorageManager
+from data_parser import get_test_dataset
 
 
 class Analyzer(object):
@@ -106,8 +103,6 @@ def benchmark_models(models: list):  # pragma: no cover
 
     data_frame = None
 
-    sm = StorageManager()
-
     for model in models:
 
         model_analyzer = Analyzer(
@@ -116,14 +111,14 @@ def benchmark_models(models: list):  # pragma: no cover
 
         model_data = StatsData(
             str(model),
-            model_analyzer.f1_score(),
-            model_analyzer.calculate_accuracy(),
-            model_analyzer.calculate_precision(),
-            model_analyzer.calculate_recall(),
-            model_analyzer.calculate_true_positives(),
-            model_analyzer.calculate_false_positives(),
-            model_analyzer.calculate_false_negatives(),
-            model_analyzer.calculate_true_negatives(),
+            f1=model_analyzer.f1_score(),
+            accuracy=model_analyzer.calculate_accuracy(),
+            precision=model_analyzer.calculate_precision(),
+            recall=model_analyzer.calculate_recall(),
+            true_positives=model_analyzer.calculate_true_positives(),
+            false_positives=model_analyzer.calculate_false_positives(),
+            true_negatives=model_analyzer.calculate_true_negatives(),
+            false_negatives=model_analyzer.calculate_false_negatives(),
         )
 
         if data_frame is None:
@@ -133,6 +128,6 @@ def benchmark_models(models: list):  # pragma: no cover
                 [data_frame, model_data.as_data_frame()], ignore_index=True
             )
 
-        sm.store_data(model_data)
+        model_data.save_to_disk()
 
     return data_frame
