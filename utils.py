@@ -10,6 +10,8 @@ def sanitize(line):
 def sanitize_all_lower(line):
     return [x.lower() for x in sanitize(line)]
 
+def sanitize_only_words(line):
+    return re.findall(r'[a-øA-Ø0-9-]+', line)
 
 def extract_sentences_from_label(dataset: DatasetDict, label: str):
     extracted_sentences = []

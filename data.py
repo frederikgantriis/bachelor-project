@@ -18,20 +18,17 @@ class Data(object):
 
 class StatsData(Data):
     def __init__(self, model_name: str, **kwargs):
-        """_summary_
-
-        Args:
-            model_name (str): _description_
+        """keyword args is optional
 
         Keyword Args:
-            f1 (float): _description_
-            accuracy (float): _description_
-            precision (float): _description_
-            recall (float): _description_
-            true_positives (float): _description_
-            false_positives (float): _description_
-            true_negatives (float): _description_
-            false_negatives (float): _description_
+            f1 (float)
+            accuracy (float)
+            precision (float)
+            recall (float)
+            true_positives (float)
+            false_positives (float)
+            true_negatives (float)
+            false_negatives (float)
         """
         super().__init__()
         self.model_name = model_name
