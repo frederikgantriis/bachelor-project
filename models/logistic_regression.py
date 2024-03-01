@@ -6,7 +6,7 @@ import decimal
 from numpy.random import permutation
 from datasets import DatasetDict, Dataset
 from models.ml_algorithm import MLAlgorithm
-from analytics.constants import OFF, NOT
+from constants import OFF, NOT
 
 
 class LogisticRegression(MLAlgorithm):
