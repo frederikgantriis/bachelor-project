@@ -3,11 +3,10 @@ import utils
 
 from datasets import DatasetDict
 from models.ml_algorithm import MLAlgorithm
-from storage_manager import StorageManager
 from data import TrainData
 
 
-class NaiveBayes(MLAlgorithm): # pragma: no cover
+class NaiveBayes(MLAlgorithm):  # pragma: no cover
     def __init__(self, dataset: DatasetDict) -> None:  # pragma: no cover
         super().__init__(dataset)  # type: ignore
         # base chance based on the split in classes in the dataset
@@ -23,7 +22,7 @@ class NaiveBayes(MLAlgorithm): # pragma: no cover
             [utils.sanitize(comment) for comment in self.dataset["text"]]
         )
 
-        self.sm = StorageManager()
+        self.train_data = TrainData('naive-bayes')
 
     def train(self):  # pragma: no cover
         c: str
@@ -45,9 +44,11 @@ class NaiveBayes(MLAlgorithm): # pragma: no cover
                 self.loglikelihood[(word, c)] = math.log10(
                     (count + 1) / (n_words - count)
                 )
-        self.sm.store_data(
-            TrainData(str(self), (self.logprior, self.loglikelihood, self.vocabulary))
-        )
+
+            # update the train data parameters
+            self.train_data.parameters = self.logprior, self.loglikelihood, self.classes
+            # save the train data to disk
+            self.train_data.save_to_disk()
 
     def test(self, test_dataset_text):
         result = []
@@ -56,7 +57,7 @@ class NaiveBayes(MLAlgorithm): # pragma: no cover
 
         for i in range(2):  # pragma: no cover
             try:
-                logprior, loglikelihood, _ = self.sm.load_data(str(self), "train")
+                logprior, loglikelihood, _ = self.train_data.load_from_disk()
                 print("Found Naive Bayes training data!")
                 break
             except FileNotFoundError:
@@ -78,11 +79,8 @@ class NaiveBayes(MLAlgorithm): # pragma: no cover
             )
         return result
 
-    def __str__(self) -> str:
-        return "naive-bayes"
 
-
-def find_class(test_instance: str, classes: list, logprior: dict, loglikelihood: dict): # pragma: no cover
+def find_class(test_instance: str, classes: list, logprior: dict, loglikelihood: dict):  # pragma: no cover
     sum = {}
     test_instance_list = utils.sanitize(test_instance)
     for c in classes:
@@ -95,7 +93,7 @@ def find_class(test_instance: str, classes: list, logprior: dict, loglikelihood:
     return utils.get_max_value_key(sum)
 
 
-def count_words(words: dict, vocabulary: list): # pragma: no cover
+def count_words(words: dict, vocabulary: list):  # pragma: no cover
     sum = 0
     for word in vocabulary:
         if word in words:
