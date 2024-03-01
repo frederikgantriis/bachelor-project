@@ -23,7 +23,7 @@ def test_make_new_stats_data_object():
 def test_make_new_train_data_object():
     train_data = TrainData("model_name", (0, 1))
     assert train_data.model_name == "model_name"
-    assert train_data.data == (0, 1)
+    assert train_data.parameters == (0, 1)
 
 
 def test_stats_data_as_data_frame():
