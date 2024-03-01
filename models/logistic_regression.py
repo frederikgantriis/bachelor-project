@@ -35,13 +35,13 @@ class LogisticRegression(MLAlgorithm):
     def crossentropy_loss(self, guess, expected):
         return -(expected * math.log(guess) + (1-expected) * math.log(1-guess))
 
-    def gradident_descent(self, features, loss, trainingspeed):
-        """Den finder Bunden
+    def gradient_descent(self, features, loss, trainingspeed):
+        """Finds gradient vector and moves the opposite way
 
         Args:
-            features (list[int]): features
-            loss (float): guess - expected
-            trainingspeed (float): hvor hurtig den går
+            features (list[int]): List of features for the comment
+            loss (float): A number giving value to how far the guess is from the right answer
+            trainingspeed (float): Dictates how fast the weights change
         """
         new_weights = [(loss*feature)*(-trainingspeed)
                        for feature in features]
@@ -58,7 +58,7 @@ class LogisticRegression(MLAlgorithm):
         self.bias_term = 0
         for i in permutation(len(self.comments)):
             (guess, features) = self.guess(self.comments[i])
-            self.gradident_descent(features, guess - self.expected[i], 0.1)
+            self.gradient_descent(features, guess - self.expected[i], 0.1)
 
     def guess(self, comment):
         """Assigns value to each feature based on comment then asignes their weight. Then normalises the output.
