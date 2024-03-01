@@ -36,7 +36,13 @@ class LogisticRegression(MLAlgorithm):
         return -(expected * math.log(guess) + (1-expected) * math.log(1-guess))
 
     def gradident_descent(self, features, loss, trainingspeed):
+        """Den finder Bunden
 
+        Args:
+            features (list[int]): features
+            loss (float): guess - expected
+            trainingspeed (float): hvor hurtig den går
+        """
         new_weights = [(loss*feature)*(-trainingspeed)
                        for feature in features]
 
