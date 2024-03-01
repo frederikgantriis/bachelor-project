@@ -24,6 +24,9 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
 
         self.train_data = TrainData('naive-bayes')
 
+    def __str__(self) -> str:
+        return "naive-bayes"
+
     def train(self):  # pragma: no cover
         c: str
         for c in self.classes:  # type: ignore
