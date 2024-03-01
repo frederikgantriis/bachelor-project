@@ -1,10 +1,9 @@
 from datasets import DatasetDict
-from models.naive_bayes import NaiveBayes
-from models.baseline_random import BaselineRandom
 from pandas import concat
 from data import StatsData
-from data_parser import get_test_dataset, get_train_dataset
+from data_parser import get_test_dataset
 from storage_manager import StorageManager
+from constants import OFF, NOT
 
 
 class Analyzer(object):
@@ -54,16 +53,16 @@ class Analyzer(object):
         ) / len(self.dataset_labels)
 
     def calculate_false_positives(self):
-        return self.count_true_labels("OFF", "NOT")
+        return self.count_true_labels(OFF, NOT)
 
     def calculate_false_negatives(self):
-        return self.count_true_labels("NOT", "OFF")
+        return self.count_true_labels(NOT, OFF)
 
     def calculate_true_positives(self):
-        return self.count_true_labels("OFF", "OFF")
+        return self.count_true_labels(OFF, OFF)
 
     def calculate_true_negatives(self):
-        return self.count_true_labels("NOT", "NOT")
+        return self.count_true_labels(NOT, NOT)
 
     def count_true_labels(
         self, compare_result_label: str, compare_test_label: str
