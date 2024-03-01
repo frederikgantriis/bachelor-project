@@ -9,11 +9,17 @@ class Data(object):
     def __init__(self) -> None:
         self.timestamp = datetime.now()
 
+    def save_to_disk(self):
+        raise NotImplementedError("not implemented")
+
+    def load_from_disk(self):
+        raise NotImplementedError("not implemented")
+
 
 class StatsData(Data):
     def __init__(self, model_name: str, **kwargs):
         """keyword args is optional
-        
+
         Keyword Args:
             f1 (float)
             accuracy (float)
@@ -82,6 +88,26 @@ class TrainData(Data):
             os.makedirs(self.folder_path)
         with open(self.disk_path, "wb") as f:
             pickle.dump(self.parameters, f)
+
+    def load_from_disk(self):
+        with open(self.disk_path, "rb") as f:
+            return pickle.load(f)
+
+
+class SanitizedTextData(Data):
+    def __init__(self, method: str, text_data: list[str]) -> None:
+        super().__init__()
+        self.folder_path = "data/text/"
+        self.disk_path = self.folder_path + method + ".pkl"
+
+        self.method = method
+        self.text_data = text_data
+
+    def save_to_disk(self):
+        if not os.path.exists(self.folder_path):
+            os.makedirs(self.folder_path)
+        with open(self.disk_path, "wb") as f:
+            pickle.dump(self.text_data, f)
 
     def load_from_disk(self):
         with open(self.disk_path, "rb") as f:
