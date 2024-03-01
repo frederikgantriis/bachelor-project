@@ -1,9 +1,7 @@
-import imp
 import math
-from operator import le
-import numpy
 import pandas as pd
 import utils
+import decimal
 
 from numpy.random import permutation
 from datasets import DatasetDict, Dataset
@@ -24,8 +22,12 @@ class LogisticRegression(MLAlgorithm):
 
         self.expected = [0 if label == OFF else 1 for label in self.expected]
 
-    def sigmoid(self, x: float):
-        return 1 / (1 + math.e ** (-x))
+    def sigmoid(self, x):
+
+        x = decimal.Decimal(x)
+        y = decimal.Decimal(math.e)
+        z = y ** (-x)
+        return float(1 / (1 + z))
 
     def is_hateful(self, word: str) -> int:
         return int(word.lower() in self.hateful_words)
@@ -33,36 +35,45 @@ class LogisticRegression(MLAlgorithm):
     def crossentropy_loss(self, guess, expected):
         return -(expected * math.log(guess) + (1-expected) * math.log(1-guess))
 
-    def gradident_descent(self, features, weights, loss, trainingspeed):
-        print(features)
+    def gradident_descent(self, features, loss, trainingspeed):
+
         new_weights = [(loss*feature)*(-trainingspeed)
                        for feature in features]
-     
-        result = [x + y for x, y in zip(weights, new_weights)]
 
-        return result
+        result = [x + y for x, y in zip(self.weights, new_weights)]
+
+        self.weights = result
+        self.bias_term += loss * (-trainingspeed)
 
     def train(self):
-        # b is the last weight
-        weights = [0, 0, 0]
-        
-        # len(self.comments)
-        for i in permutation(200):
-            # print(weights)
-            # b is the last feature
-            features = [0, 0, 1]
-            x = self.comments[i]
+        """Resets weights and bias term, then train model on all comments in a random order
+        """
+        self.weights = [0, 0]
+        self.bias_term = 0
+        for i in permutation(len(self.comments)):
+            (guess, features) = self.guess(self.comments[i])
+            self.gradident_descent(features, guess - self.expected[i], 0.1)
 
-            for word in x:
-                if self.is_hateful(word):
-                    features[0] += 1
-                else:
+    def guess(self, comment):
+        """Assigns value to each feature based on comment then asignes their weight. Then normalises the output.
 
-                    features[1] += 1
-            predict = [x + y for x, y in zip(weights, features)]
-            predict[-1] = 0
-            weights = self.gradident_descent(features, weights, self.sigmoid(
-                sum(predict)+weights[-1])-self.expected[i], 0.1)
+        Args:
+            comment (list[str]): list of words in a specific comment
+
+        Returns:
+            float, list[int]: returns a number between 0 and 1, 0 indicating a hateful comment and 1 the opposite
+        """
+        features = [0, 0]
+
+        for word in comment:
+            if self.is_hateful(word):
+                features[0] += 1
+            else:
+                features[1] += 1
+
+        predict = [x * y for x, y in zip(self.weights, features)]
+
+        return (self.sigmoid(sum(predict)+self.bias_term), features)
 
     def test(self, test_dataset_text: list):
         return super().test(test_dataset_text)
