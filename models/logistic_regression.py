@@ -84,7 +84,7 @@ class LogisticRegression(MLAlgorithm):
     def test(self, test_dataset_text: list):
         result = []
         self.train()
-        print(self.weights, self.bias_term)
+        
         test_comments = [utils.sanitize(comment)
                          for comment in test_dataset_text]
         for test in test_comments:
