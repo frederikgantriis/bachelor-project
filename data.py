@@ -9,26 +9,33 @@ class Data(object):
     def __init__(self) -> None:
         self.timestamp = datetime.now()
 
-    def save_to_disk(self):
-        raise NotImplementedError("not implemented")
+    def save_to_disk(self, data, folder_path, disk_path):
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+        with open(disk_path, "wb") as f:
+            pickle.dump(data, f)
 
-    def load_from_disk(self):
-        raise NotImplementedError("not implemented")
+    def load_from_disk(self, disk_path):
+        with open(disk_path, "rb") as f:
+            return pickle.load(f)
 
 
 class StatsData(Data):
     def __init__(self, model_name: str, **kwargs):
         """keyword args is optional
 
+        Args:
+            model_name (str): model name
+
         Keyword Args:
-            f1 (float)
-            accuracy (float)
-            precision (float)
-            recall (float)
-            true_positives (float)
-            false_positives (float)
-            true_negatives (float)
-            false_negatives (float)
+            f1 (float): f1 score
+            accuracy (float): accuracy
+            precision (float): precision
+            recall (float): recall
+            true_positives (float): true positives
+            false_positives (float): false positives
+            true_negatives (float): true negatives
+            false_negatives (float): false negatives
         """
         super().__init__()
         self.model_name = model_name
@@ -84,14 +91,10 @@ class TrainData(Data):
         self.parameters = parameters
 
     def save_to_disk(self):
-        if not os.path.exists(self.folder_path):
-            os.makedirs(self.folder_path)
-        with open(self.disk_path, "wb") as f:
-            pickle.dump(self.parameters, f)
+        super().save_to_disk(self.parameters, self.folder_path, self.disk_path)
 
     def load_from_disk(self):
-        with open(self.disk_path, "rb") as f:
-            return pickle.load(f)
+        return super().load_from_disk(self.disk_path)
 
 
 class SanitizedTextData(Data):
@@ -104,11 +107,10 @@ class SanitizedTextData(Data):
         self.text_data = text_data
 
     def save_to_disk(self):
-        if not os.path.exists(self.folder_path):
-            os.makedirs(self.folder_path)
-        with open(self.disk_path, "wb") as f:
-            pickle.dump(self.text_data, f)
+        return super().save_to_disk(self.text_data, self.folder_path, self.disk_path)
 
     def load_from_disk(self):
-        with open(self.disk_path, "rb") as f:
-            return pickle.load(f)
+        return super().load_from_disk(self.disk_path)
+
+    def __repr__(self) -> str:
+        return
