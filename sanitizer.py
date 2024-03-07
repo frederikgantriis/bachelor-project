@@ -1,21 +1,38 @@
 import re
 import spacy
 
+from data import SanitizedDataset
+
 
 class Sanitizer(object):
-    def __init__(self, comment: str):
-        self.comment: str = comment
+    def __init__(self, sentences: list[str]):
+        self.sentences: str = sentences
 
-    def sanitize_simple(self):
-        return re.findall(r"[a-øA-Ø0-9-]+|[^a-zæøåA-ZÆØÅ0-9\s]+", self.comment)
+    # def sanitize_simple(self):
+    #     return re.findall(r"[a-øA-Ø0-9-]+|[^a-zæøåA-ZÆØÅ0-9\s]+", self.sentences)
 
-    def sanitize_all_lower(self):
-        return [x.lower() for x in self.sanitize_simple(self.comment)]
+    # def sanitize_all_lower(self):
+    #     return [x.lower() for x in self.sanitize_simple(self.sentences)]
 
-    def sanitize_only_words(self, line):
-        return re.findall(r"[a-øA-Ø0-9-]+", line)
+    # def sanitize_only_words(self, line):
+    #     return re.findall(r"[a-øA-Ø0-9-]+", line)
 
-    def remove_stop_words(self) -> list[str]:
-        """removes most common words danish words from a string"""
-        nlp = spacy.load("da_core_news_sm")
-        return [x.text for x in nlp(self.comment) if not x.is_stop]
+    # def remove_stop_words(self) -> list[str]:
+    #     """removes most common words danish words from a string"""
+    #     nlp = spacy.load("da_core_news_sm")
+    #     return [x.text for x in nlp(self.sentences) if not x.is_stop]
+
+
+def sync_disk(method: str, result: list[str]):
+    if type(result) != list or type(result[0]) != str:
+        raise ValueError("Sanitized data must be a list of strings")
+
+    try:
+        disk_data = SanitizedDataset(method, []).load_from_disk()
+        print("Successfully loaded from disk!")
+    except FileNotFoundError:
+        print("FileNotFound: Saving to disk before loading...")
+        SanitizedDataset(method, result).save_to_disk()
+        disk_data = SanitizedDataset(method, []).load_from_disk()
+        print("Successfully loaded from disk!")
+    print(disk_data)
