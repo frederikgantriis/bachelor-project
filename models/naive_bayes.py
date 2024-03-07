@@ -4,6 +4,7 @@ import utils
 from datasets import DatasetDict
 from models.ml_algorithm import MLAlgorithm
 from data import TrainData
+from sanitizer import Sanitizer
 
 
 class NaiveBayes(MLAlgorithm):  # pragma: no cover
@@ -19,10 +20,10 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
 
         # creates a list of all words in the dataset after sentences have been sanitized
         self.vocabulary = utils.flatten(
-            [utils.sanitize(comment) for comment in self.dataset["text"]]
+            [Sanitizer(comment).sanitize_simple() for comment in self.dataset["text"]]
         )
 
-        self.train_data = TrainData('naive-bayes')
+        self.train_data = TrainData("naive-bayes")
 
     def __str__(self) -> str:
         return "naive-bayes"
@@ -83,9 +84,11 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
         return result
 
 
-def find_class(test_instance: str, classes: list, logprior: dict, loglikelihood: dict):  # pragma: no cover
+def find_class(
+    test_instance: str, classes: list, logprior: dict, loglikelihood: dict
+):  # pragma: no cover
     sum = {}
-    test_instance_list = utils.sanitize(test_instance)
+    test_instance_list = Sanitizer(test_instance).sanitize_simple()
     for c in classes:
         sum[c] = logprior[c]
         for word in test_instance_list:
