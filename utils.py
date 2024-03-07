@@ -1,14 +1,6 @@
-import re
 from datasets import DatasetDict
-import spacy
+from sanitizer import Sanitizer
 
-
-def sanitize(line):
-    return re.findall(r'[a-zæøåA-ZÆÅØ0-9-]+|[^a-zæøåA-ZÆØÅ0-9\s]+', line)
-
-
-def sanitize_all_lower(line):
-    return [x.lower() for x in sanitize(line)]
 
 def extract_sentences_from_label(dataset: DatasetDict, label: str):
     extracted_sentences = []
@@ -25,7 +17,7 @@ def extract_words_from_label(dataset: DatasetDict, label: str):
     sentences = extract_sentences_from_label(dataset, label)
 
     for s in sentences:
-        s = sanitize(s)
+        s = Sanitizer(s).sanitize_simple()
         for word in s:
             if word not in extracted_words:
                 extracted_words[word] = 1
@@ -53,9 +45,3 @@ def flatten(matrix: list) -> list:
         list: 1d list
     """
     return [item for row in matrix for item in row]
-
-
-def remove_stop_words(sentence: str) -> list[str]:
-    """removes most common words danish words from a string"""
-    nlp = spacy.load("da_core_news_sm")
-    return [x.text for x in nlp(sentence) if not x.is_stop]
