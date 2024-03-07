@@ -4,14 +4,11 @@ import spacy
 
 
 def sanitize(line):
-    return re.findall(r'[a-øA-Ø0-9-]+|[^a-zæøåA-ZÆØÅ0-9\s]+', line)
+    return re.findall(r'[a-zæøåA-ZÆÅØ0-9-]+|[^a-zæøåA-ZÆØÅ0-9\s]+', line)
 
 
 def sanitize_all_lower(line):
     return [x.lower() for x in sanitize(line)]
-
-def sanitize_only_words(line):
-    return re.findall(r'[a-øA-Ø0-9-]+', line)
 
 def extract_sentences_from_label(dataset: DatasetDict, label: str):
     extracted_sentences = []

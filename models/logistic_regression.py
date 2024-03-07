@@ -57,17 +57,19 @@ class LogisticRegression(MLAlgorithm):
         self.weights = [0, 0]
         self.bias_term = 0
         for i in permutation(len(self.comments)):
-            (guess, features) = self.guess(self.comments[i])
+            features = self.calculate_feature_amount(self.comments[i])
+            vector_product = [x * y for x, y in zip(self.weights, features)]
+            guess = self.sigmoid(sum(vector_product)+self.bias_term)
             self.gradient_descent(features, guess - self.expected[i], 0.1)
 
-    def guess(self, comment):
+    def calculate_feature_amount(self, comment):
         """Assigns value to each feature based on comment then asignes their weight. Then normalises the output.
 
         Args:
             comment (list[str]): list of words in a specific comment
 
         Returns:
-            float, list[int]: returns a number between 0 and 1, 0 indicating a hateful comment and 1 the opposite
+            list[int]: List of features amount ex. amount of hate words 
         """
         features = [0, 0]
 
@@ -77,9 +79,23 @@ class LogisticRegression(MLAlgorithm):
             else:
                 features[1] += 1
 
-        predict = [x * y for x, y in zip(self.weights, features)]
-
-        return (self.sigmoid(sum(predict)+self.bias_term), features)
+        return features
 
     def test(self, test_dataset_text: list):
-        return super().test(test_dataset_text)
+        result = []
+        self.train()
+        
+        test_comments = [utils.sanitize(comment)
+                         for comment in test_dataset_text]
+        for test in test_comments:
+            features = self.calculate_feature_amount(test)
+            vector_product = [x * y for x, y in zip(self.weights, features)]
+            guess = self.sigmoid(sum(vector_product)+self.bias_term)
+
+            result.append(OFF) if guess > 0.5 else result.append(NOT)
+           
+
+        return result
+
+    def __str__(self) -> str:
+        return "logistic-regression"
