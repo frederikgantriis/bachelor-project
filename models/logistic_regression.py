@@ -60,7 +60,6 @@ class LogisticRegression(MLAlgorithm):
             features = self.calculate_feature_amount(self.comments[i])
             vector_product = [x * y for x, y in zip(self.weights, features)]
             guess = self.sigmoid(sum(vector_product)+self.bias_term)
-            
             self.gradient_descent(features, guess - self.expected[i], 0.1)
 
     def calculate_feature_amount(self, comment):
@@ -83,4 +82,20 @@ class LogisticRegression(MLAlgorithm):
         return features
 
     def test(self, test_dataset_text: list):
-        
+        result = []
+        self.train()
+        print(self.weights, self.bias_term)
+        test_comments = [utils.sanitize(comment)
+                         for comment in test_dataset_text]
+        for test in test_comments:
+            features = self.calculate_feature_amount(test)
+            vector_product = [x * y for x, y in zip(self.weights, features)]
+            guess = self.sigmoid(sum(vector_product)+self.bias_term)
+
+            result.append(OFF) if guess > 0.5 else result.append(NOT)
+           
+
+        return result
+
+    def __str__(self) -> str:
+        return "logistic-regression"
