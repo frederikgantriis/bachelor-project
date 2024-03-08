@@ -6,11 +6,9 @@ from models.ml_algorithm import MLAlgorithm
 
 
 class BaselineRandom(MLAlgorithm):  # pragma: no cover
-    def __init__(self) -> None:
-        dataset = get_test_dataset()
+    def __init__(self, dataset) -> None:
         super().__init__(dataset)
-        self.classes: list = list(set(self.dataset["label"]))
-        self.comments: Dataset = dataset["text"]
+        self.classes: list = self.dataset.keys()
 
     def train(self):
         pass
@@ -18,7 +16,7 @@ class BaselineRandom(MLAlgorithm):  # pragma: no cover
     def test(self, test_dataset_text: list | None):
         answer = []
 
-        for _ in range(len(self.comments)):
+        for _ in range(len(test_dataset_text)):
             answer.append(random.choice(self.classes))
 
         return answer
