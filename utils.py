@@ -1,3 +1,4 @@
+from os import name, system
 from datasets import DatasetDict
 from sanitizer import Sanitizer
 
@@ -45,3 +46,14 @@ def flatten(matrix: list) -> list:
         list: 1d list
     """
     return [item for row in matrix for item in row]
+
+
+def clear():
+ 
+    # for windows
+    if name == 'nt':
+        _ = system('cls')
+ 
+    # for mac and linux(here, os.name is 'posix')
+    else:
+        _ = system('clear')
