@@ -251,11 +251,11 @@ class Benchmarker(object):
                 figsize=(20, 10),
                 autopct="%1.1f%%",
                 legend=False,
-                title=f"{model_benchmark["model_name"].values[0]}",
+                title=f"{model_benchmark["model_name"].values[i]}",
             )
 
-            makedir(f"img/{model_benchmark["model_name"].values[0]}")
-            plt.savefig(f"img/{model_benchmark["model_name"].values[0]}/pie_chart.png")
+            makedir(f"img/{model_benchmark["model_name"].values[i]}")
+            plt.savefig(f"img/{model_benchmark["model_name"].values[i]}/pie_chart.png")
 
     def create_bar_chart_f1(self, repetitions: int):
         """Create a bar chart of the average f1 score for each model
