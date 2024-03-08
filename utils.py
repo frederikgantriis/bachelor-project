@@ -1,4 +1,5 @@
 from os import name, system
+import os
 from datasets import DatasetDict
 from sanitizer import Sanitizer
 
@@ -57,3 +58,8 @@ def clear():
     # for mac and linux(here, os.name is 'posix')
     else:
         _ = system('clear')
+
+
+def makedir(path: str):
+    if not os.path.exists(path):
+        os.makedirs(path)
