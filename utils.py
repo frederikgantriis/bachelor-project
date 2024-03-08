@@ -1,6 +1,5 @@
 from os import name, system
 from datasets import DatasetDict
-from sanitizer import Sanitizer
 
 
 def extract_sentences_from_label(dataset: DatasetDict, label: str):
@@ -49,11 +48,11 @@ def flatten(matrix: list) -> list:
 
 
 def clear():
- 
+
     # for windows
     if name == 'nt':
         _ = system('cls')
- 
+
     # for mac and linux(here, os.name is 'posix')
     else:
         _ = system('clear')
