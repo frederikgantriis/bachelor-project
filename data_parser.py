@@ -1,6 +1,7 @@
 from copy import deepcopy
 import os
 import sys
+from typing import Callable
 from datasets import load_dataset, load_from_disk, Dataset, DatasetDict
 from dotenv import load_dotenv
 import spacy
@@ -36,18 +37,17 @@ class Datasets(object):
         self.dataset = convert_dataset(nlp, datasets[dataset_type])
         print("spacy done converting...")
 
-    def unsanitized(self):
+    def remove_dots(self):
+        method: Callable[[list[Token]], list[Token]] = lambda lst: [
+            x for x in lst if not x.pos_ == "PUNCT"]
+        self.dataset = sanitize_dict(self.dataset, method)
         return self
 
-    def without_stop_words(self):
-        """exclude stop words"""
-        new_dict = {}
-        for key in self.dataset.keys():
-            lst = []
-            for value in self.dataset[key]:
-                lst.append(simple(value))
-            new_dict[key] = lst
-        self.dataset = new_dict
+    def remove_stop_words(self):
+        method: Callable[[list[Token]], list[Token]] = lambda lst: [
+            x for x in lst if not x.is_stop]
+
+        self.dataset = sanitize_dict(self.dataset, method)
         return self
 
     def to_dict(self) -> dict[str, list]:
@@ -75,6 +75,16 @@ def convert_dataset(nlp: Language, dataset: Dataset):
             not_offensive_sentences.append(doc)
 
     return {"OFF": offensive_sentences, "NOT": not_offensive_sentences}
+
+
+def sanitize_dict(d, func):
+    new_dict = {}
+    for key in d.keys():
+        lst = []
+        for value in d[key]:
+            lst.append(func(value))
+        new_dict[key] = lst
+    return new_dict
 
 
 def simple(lst: list[Token]) -> list[Token]:

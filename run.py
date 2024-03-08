@@ -4,9 +4,12 @@ from models.naive_bayes import NaiveBayes
 
 if __name__ == "__main__":
     dataset_train = Datasets("train")
-    print(dataset_train.unsanitized().to_dict()["OFF"][0])
-    print(dataset_train.unsanitized().without_stop_words().to_dict()["OFF"][0])
-    print(dataset_train.unsanitized().to_dict()["OFF"][0])
+    dataset_train.remove_dots()
+    print(dataset_train.to_dict()["OFF"][0])
+    dataset_train.remove_stop_words()
+    print(dataset_train.to_dict()["OFF"][0])
+    dataset_train.remove_stop_words().remove_dots()
+    print(dataset_train.to_dict()["OFF"][0])
 
     # nb_type_2 = NaiveBayes(datasets.without_dots("train"))
 
