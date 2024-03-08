@@ -1,3 +1,4 @@
+from pyexpat import model
 from pandas import DataFrame, concat
 from data import StatsData
 from data_parser import get_test_dataset
@@ -12,6 +13,28 @@ class Benchmarker(object):
         self.dataset = get_test_dataset()
         self.dataset_labels = self.dataset["label"]
         self.models = models
+        self.benchmark = None
+
+    def create_all_charts(self, repetitions: int):
+        """Create all the charts for the models
+
+        Args:
+            models (list): list of all the models
+        """
+
+        self.create_bar_chart_f1(repetitions)
+        self.create_bar_chart_accuracy(repetitions)
+        self.create_bar_chart_precision(repetitions)
+        self.create_bar_chart_recall(repetitions)
+        self.create_diagram_repetition(repetitions)
+        self.create_pie_chart(repetitions)
+
+
+    def _get_benchmark(self, repetitions: int):
+        if self.benchmark is None:
+            self.benchmark = self.benchmark_models(repetitions)
+        
+        return self.benchmark
 
     def f1_score(self, result_labels: list[str]) -> float:
         """Get the f1_score based labels from model and labels from the test dataset
@@ -197,13 +220,13 @@ class Benchmarker(object):
         f1_scores = []
         model_names = []
 
-        for i in range(len(self.models)):
-            model_benchmark = self.benchmark_models_with_index(repetitions, i)
+        model_benchmark = self._get_benchmark(repetitions)
 
-            true_positives = model_benchmark["true_positives"].values[0]
-            false_positives = model_benchmark["false_positives"].values[0]
-            true_negatives = model_benchmark["true_negatives"].values[0]
-            false_negatives = model_benchmark["false_negatives"].values[0]
+        for i in range(len(self.models)):
+            true_positives = model_benchmark["true_positives"].values[i]
+            false_positives = model_benchmark["false_positives"].values[i]
+            true_negatives = model_benchmark["true_negatives"].values[i]
+            false_negatives = model_benchmark["false_negatives"].values[i]
 
             df = DataFrame(
                 {
@@ -233,7 +256,6 @@ class Benchmarker(object):
 
             makedir(f"img/{model_benchmark["model_name"].values[0]}")
             plt.savefig(f"img/{model_benchmark["model_name"].values[0]}/pie_chart.png")
-            plt.show()
 
     def create_bar_chart_f1(self, repetitions: int):
         """Create a bar chart of the average f1 score for each model
@@ -244,7 +266,7 @@ class Benchmarker(object):
 
         f1_scores = []
         model_names = []
-        model_benchmark = self.benchmark_models(repetitions)
+        model_benchmark = self._get_benchmark(repetitions)
 
         for i in range(len(self.models)):
 
@@ -257,7 +279,6 @@ class Benchmarker(object):
 
         makedir("img")
         plt.savefig("img/f1_score.png")
-        plt.show()
 
     def create_bar_chart_accuracy(self, repetitions: int):
         """Create a bar chart of the average accuracy for each model
@@ -268,7 +289,7 @@ class Benchmarker(object):
 
         accuracies = []
         model_names = []
-        model_benchmark = self.benchmark_models(repetitions)
+        model_benchmark = self._get_benchmark(repetitions)
 
         for i in range(len(self.models)):
 
@@ -281,7 +302,6 @@ class Benchmarker(object):
 
         makedir("img")
         plt.savefig("img/accuracy.png")
-        plt.show()
 
     def create_bar_chart_precision(self, repetitions: int):
         """Create a bar chart of the average precision for each model
@@ -292,7 +312,7 @@ class Benchmarker(object):
 
         precisions = []
         model_names = []
-        model_benchmark = self.benchmark_models(repetitions)
+        model_benchmark = self._get_benchmark(repetitions)
 
         for i in range(len(self.models)):
 
@@ -305,7 +325,6 @@ class Benchmarker(object):
 
         makedir("img")
         plt.savefig("img/precision.png")
-        plt.show()
 
     def create_bar_chart_recall(self, repetitions: int):
         """Create a bar chart of the average recall for each model
@@ -316,7 +335,7 @@ class Benchmarker(object):
 
         recalls = []
         model_names = []
-        model_benchmark = self.benchmark_models(repetitions)
+        model_benchmark = self._get_benchmark(repetitions)
 
         for i in range(len(self.models)):
 
@@ -329,7 +348,6 @@ class Benchmarker(object):
 
         makedir("img")
         plt.savefig("img/recall.png")
-        plt.show()
 
     def create_diagram_repetition(self, repetitions: int):
         """Create a diagram of the average f1 score for each model
@@ -373,5 +391,4 @@ class Benchmarker(object):
 
             makedir(f"img/{model_benchmark["model_name"].values[0]}")
             plt.savefig(f"img/{model_benchmark["model_name"].values[0]}/repetition.png")
-            plt.show()
 
