@@ -53,6 +53,9 @@ class Datasets(object):
         """
         return self.dataset
 
+    def to_list(self) -> list[list]:
+        return list(self.dataset.values())
+
     def remove_dots(self):
         """remove all punctuation"""
         method: Callable[[list[Token]], list[Token]] = lambda lst: [
