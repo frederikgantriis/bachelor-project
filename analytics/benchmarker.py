@@ -125,9 +125,9 @@ class Benchmarker(object):
                 "false_negatives": 0,
             }
 
+            print(f"Testing model: {model}")
             for _ in range(repetitions):
-                print(f"Testing model: {model}")
-                print(f"Repetition: {_ + 1}/{repetitions}")
+                print(f"Repetition: {_ + 1}/{repetitions}", end="\r")
 
                 result_labels = model.test(self.dataset["text"])
 
@@ -147,12 +147,9 @@ class Benchmarker(object):
                 stats_average["false_negatives"] += self.calculate_false_negatives(
                     result_labels
                 )
-                clear()
-
 
             for key in stats_average:
                 stats_average[key] = stats_average[key] / repetitions
-                
 
             model_data = StatsData(
                 str(model),
@@ -174,5 +171,8 @@ class Benchmarker(object):
                 )
 
             model_data.save_to_disk()
+
+            # Clear terminal
+            clear()
 
         return data_frame
