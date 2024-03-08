@@ -95,22 +95,3 @@ class TrainData(Data):
 
     def load_from_disk(self):
         return super().load_from_disk(self.disk_path)
-
-
-class SanitizedDataset(Data):
-    def __init__(self, method: str, sanitized_text: list[str]) -> None:
-        super().__init__()
-        self.folder_path = "data/text/"
-        self.disk_path = self.folder_path + method + ".pkl"
-
-        self.method = method
-        self.sanitized_text = sanitized_text
-
-    def save_to_disk(self):
-        return super().save_to_disk(self.sanitized_text, self.folder_path, self.disk_path)
-
-    def load_from_disk(self):
-        return super().load_from_disk(self.disk_path)
-
-    def __repr__(self) -> str:
-        return

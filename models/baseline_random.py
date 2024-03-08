@@ -2,7 +2,6 @@ import random
 
 from datasets import DatasetDict, Dataset
 import pytest
-from data_parser import get_test_dataset
 from models.ml_algorithm import MLAlgorithm
 
 
