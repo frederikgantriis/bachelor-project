@@ -5,7 +5,7 @@ from pandas import DataFrame
 import pandas
 
 
-class Data(object):
+class DataStorage(object):
     def __init__(self) -> None:
         self.timestamp = datetime.now()
 
@@ -20,7 +20,7 @@ class Data(object):
             return pickle.load(f)
 
 
-class StatsData(Data):
+class StatsData(DataStorage):
     def __init__(self, model_name: str, **kwargs):
         """keyword args is optional
 
@@ -81,7 +81,7 @@ class StatsData(Data):
         return pandas.read_csv(self.disk_path)
 
 
-class TrainData(Data):
+class TrainData(DataStorage):
     def __init__(self, model_name: str, *parameters) -> None:
         super().__init__()
         self.model_name = model_name

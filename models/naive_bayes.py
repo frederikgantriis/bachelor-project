@@ -3,8 +3,7 @@ import utils
 
 from datasets import DatasetDict
 from models.ml_algorithm import MLAlgorithm
-from data import TrainData
-from sanitizer import Sanitizer
+from data_storage import TrainData
 
 
 class NaiveBayes(MLAlgorithm):  # pragma: no cover
@@ -20,7 +19,8 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
 
         # creates a list of all words in the dataset after sentences have been sanitized
         self.vocabulary = utils.flatten(
-            [Sanitizer(comment).sanitize_simple() for comment in self.dataset["text"]]
+            [Sanitizer(comment).sanitize_simple()
+             for comment in self.dataset["text"]]
         )
 
         self.train_data = TrainData("naive-bayes")

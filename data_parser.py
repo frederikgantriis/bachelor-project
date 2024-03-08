@@ -8,7 +8,7 @@ import spacy
 from spacy.language import Language
 from spacy.tokens import Token
 
-from data import Data
+from data_storage import DataStorage
 
 
 class Datasets(object):
@@ -33,7 +33,7 @@ class Datasets(object):
         # MUST be sanitized to result in the correct format which is:
         # DICT of LISTS of LISTS of words
         nlp = spacy.load("da_core_news_sm")
-        storage = Data()
+        storage = DataStorage()
         folder_path = "data/spacy/"
         disk_path = folder_path + dataset_type + ".pkl"
 
