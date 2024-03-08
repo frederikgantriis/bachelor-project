@@ -33,9 +33,19 @@ class Datasets(object):
         # MUST be sanitized to result in the correct format which is:
         # DICT of LISTS of LISTS of words
         nlp = spacy.load("da_core_news_sm")
-        print("spacy converting dataset...")
-        self.dataset = convert_dataset(nlp, datasets[dataset_type])
-        print("spacy done converting...")
+        storage = Data()
+        folder_path = "data/spacy/"
+        disk_path = folder_path + dataset_type + ".pkl"
+
+        try:
+            self.dataset = storage.load_from_disk(disk_path)
+            print("Found tokenized dataset on disk!")
+        except FileNotFoundError:
+            print(
+                "No tokenized dataset on disk...\nTokenizing dataset using spacy and saving to disk...")
+            self.dataset = convert_dataset(nlp, datasets[dataset_type])
+            storage.save_to_disk(self.dataset, folder_path, disk_path)
+            print("Succesfully tokenized dataset and saved to disk!")
 
     def remove_dots(self):
         method: Callable[[list[Token]], list[Token]] = lambda lst: [
@@ -67,7 +77,7 @@ def convert_dataset(nlp: Language, dataset: Dataset):
     not_offensive_sentences = []
 
     for item in list(zip(dataset["text"], dataset["label"])):
-        doc = [token for token in nlp(item[0])]
+        doc = nlp(item[0])
 
         if item[1] == "OFF":
             offensive_sentences.append(doc)
@@ -85,7 +95,3 @@ def sanitize_dict(d, func):
             lst.append(func(value))
         new_dict[key] = lst
     return new_dict
-
-
-def simple(lst: list[Token]) -> list[Token]:
-    return [x for x in lst if not x.is_stop]
