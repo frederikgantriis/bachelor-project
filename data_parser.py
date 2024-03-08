@@ -47,21 +47,25 @@ class Datasets(object):
             storage.save_to_disk(self.dataset, folder_path, disk_path)
             print("Succesfully tokenized dataset and saved to disk!")
 
+    def to_dict(self) -> dict[str, list]:
+        """Returns:
+            dict[str, list]: a dataset in the format that our models accept
+        """
+        return self.dataset
+
     def remove_dots(self):
+        """remove all punctuation"""
         method: Callable[[list[Token]], list[Token]] = lambda lst: [
             x for x in lst if not x.pos_ == "PUNCT"]
         self.dataset = sanitize_dict(self.dataset, method)
         return self
 
     def remove_stop_words(self):
+        """remove the most common words in the danish language"""
         method: Callable[[list[Token]], list[Token]] = lambda lst: [
             x for x in lst if not x.is_stop]
-
         self.dataset = sanitize_dict(self.dataset, method)
         return self
-
-    def to_dict(self) -> dict[str, list]:
-        return self.dataset
 
 
 def convert_dataset(nlp: Language, dataset: Dataset):
