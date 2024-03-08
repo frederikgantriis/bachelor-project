@@ -1,9 +1,10 @@
-from pandas import concat
+from pandas import DataFrame, concat
 from data import StatsData
 from data_parser import get_test_dataset
 from constants import OFF, NOT
 from models.ml_algorithm import MLAlgorithm
-from utils import clear
+from utils import clear, makedir
+import matplotlib.pyplot as plt
 
 
 class Benchmarker(object):
@@ -99,8 +100,11 @@ class Benchmarker(object):
                 counter += 1
 
         return counter
-
+    
     def benchmark_models(self, repetitions: int):  # pragma: no cover
+        return self.benchmark_models_with_index(repetitions, None)
+
+    def benchmark_models_with_index(self, repetitions: int, model_index: int):  # pragma: no cover
         """tests each model, saves the result to data/models/stats and returns a data-frame containing all test-results
 
         Args:
@@ -110,9 +114,15 @@ class Benchmarker(object):
             DataFrame: A DataFrame containing all the test-results from the different models
         """
 
+        if model_index is not None:
+            models = [self.models[model_index]]
+        else:
+            models = self.models
+
+
         data_frame = None
 
-        for model in self.models:
+        for model in models:
 
             stats_average = {
                 "f1": 0,
@@ -176,3 +186,192 @@ class Benchmarker(object):
             clear()
 
         return data_frame
+
+    def create_pie_chart(self, repetitions: int):
+        """Create a pie chart of the average f1 score for each model
+
+        Args:
+            models (list): list of all the models
+        """
+
+        f1_scores = []
+        model_names = []
+
+        for i in range(len(self.models)):
+            model_benchmark = self.benchmark_models_with_index(repetitions, i)
+
+            true_positives = model_benchmark["true_positives"].values[0]
+            false_positives = model_benchmark["false_positives"].values[0]
+            true_negatives = model_benchmark["true_negatives"].values[0]
+            false_negatives = model_benchmark["false_negatives"].values[0]
+
+            df = DataFrame(
+                {
+                    "Amount": [
+                        true_positives,
+                        false_positives,
+                        true_negatives,
+                        false_negatives,
+                    ],
+
+                },
+                index=[
+                    "True Positives",
+                    "False Positives",
+                    "True Negatives",
+                    "False Negatives",
+                ],
+            )
+
+            df.plot.pie(
+                subplots=True,
+                figsize=(20, 10),
+                autopct="%1.1f%%",
+                legend=False,
+                title=f"{model_benchmark["model_name"].values[0]}",
+            )
+
+            makedir(f"img/{model_benchmark["model_name"].values[0]}")
+            plt.savefig(f"img/{model_benchmark["model_name"].values[0]}/pie_chart.png")
+            plt.show()
+
+    def create_bar_chart_f1(self, repetitions: int):
+        """Create a bar chart of the average f1 score for each model
+
+        Args:
+            models (list): list of all the models
+        """
+
+        f1_scores = []
+        model_names = []
+        model_benchmark = self.benchmark_models(repetitions)
+
+        for i in range(len(self.models)):
+
+            f1_scores.append(model_benchmark["f1"].values[i])
+            model_names.append(model_benchmark["model_name"].values[i])
+
+        df = DataFrame({"F1 Score": f1_scores}, index=model_names)
+
+        df.plot(kind="bar", figsize=(20, 10), legend=False, title="F1 Score")
+
+        makedir("img")
+        plt.savefig("img/f1_score.png")
+        plt.show()
+
+    def create_bar_chart_accuracy(self, repetitions: int):
+        """Create a bar chart of the average accuracy for each model
+
+        Args:
+            models (list): list of all the models
+        """
+
+        accuracies = []
+        model_names = []
+        model_benchmark = self.benchmark_models(repetitions)
+
+        for i in range(len(self.models)):
+
+            accuracies.append(model_benchmark["accuracy"].values[i])
+            model_names.append(model_benchmark["model_name"].values[i])
+
+        df = DataFrame({"Accuracy": accuracies}, index=model_names)
+
+        df.plot(kind="bar", figsize=(20, 10), legend=False, title="Accuracy")
+
+        makedir("img")
+        plt.savefig("img/accuracy.png")
+        plt.show()
+
+    def create_bar_chart_precision(self, repetitions: int):
+        """Create a bar chart of the average precision for each model
+
+        Args:
+            models (list): list of all the models
+        """
+
+        precisions = []
+        model_names = []
+        model_benchmark = self.benchmark_models(repetitions)
+
+        for i in range(len(self.models)):
+
+            precisions.append(model_benchmark["precision"].values[i])
+            model_names.append(model_benchmark["model_name"].values[i])
+
+        df = DataFrame({"Precision": precisions}, index=model_names)
+
+        df.plot(kind="bar", figsize=(20, 10), legend=False, title="Precision")
+
+        makedir("img")
+        plt.savefig("img/precision.png")
+        plt.show()
+
+    def create_bar_chart_recall(self, repetitions: int):
+        """Create a bar chart of the average recall for each model
+
+        Args:
+            models (list): list of all the models
+        """
+
+        recalls = []
+        model_names = []
+        model_benchmark = self.benchmark_models(repetitions)
+
+        for i in range(len(self.models)):
+
+            recalls.append(model_benchmark["recall"].values[i])
+            model_names.append(model_benchmark["model_name"].values[i])
+
+        df = DataFrame({"Recall": recalls}, index=model_names)
+
+        df.plot(kind="bar", figsize=(20, 10), legend=False, title="Recall")
+
+        makedir("img")
+        plt.savefig("img/recall.png")
+        plt.show()
+
+    def create_diagram_repetition(self, repetitions: int):
+        """Create a diagram of the average f1 score for each model
+
+        Args:
+            models (list): list of all the models
+        """
+
+
+        for i in range(len(self.models)):
+            f1_scores = []
+            accuracy = []
+            precision = []
+            recall = []
+
+
+            for _ in range(repetitions):
+                model_benchmark = self.benchmark_models_with_index(1, i)
+                f1_scores.append(model_benchmark["f1"].values[0])
+                accuracy.append(model_benchmark["accuracy"].values[0])
+                precision.append(model_benchmark["precision"].values[0])
+                recall.append(model_benchmark["recall"].values[0])
+
+
+            df = DataFrame(
+                {
+                    "F1 Score": f1_scores,
+                    "Accuracy": accuracy,
+                    "Precision": precision,
+                    "Recall": recall,
+                },
+                index=[i for i in range(repetitions)],
+            )
+
+            df.plot(
+                kind="line",
+                figsize=(20, 10),
+                legend=True,
+                title=f"{model_benchmark["model_name"].values[0]}",
+            )
+
+            makedir(f"img/{model_benchmark["model_name"].values[0]}")
+            plt.savefig(f"img/{model_benchmark["model_name"].values[0]}/repetition.png")
+            plt.show()
+
