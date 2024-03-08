@@ -20,7 +20,8 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
 
         # creates a list of all words in the dataset after sentences have been sanitized
         self.vocabulary = utils.flatten(
-            [Sanitizer(comment).sanitize_simple() for comment in self.dataset["text"]]
+            [Sanitizer(comment).sanitize_simple()
+             for comment in self.dataset["text"]]
         )
 
         self.train_data = TrainData("naive-bayes")
@@ -36,7 +37,7 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
             # it gives a base chance for it being NOT or OFF based on the split in the dataset
             self.logprior[c] = math.log10(n_classes / self.n_instances)
 
-            words_in_class = utils.extract_words_from_label(self.dataset, c)
+            words_in_class = self.extract_words_from_label(self.dataset, c)
             n_words = count_words(words_in_class, self.vocabulary)
 
             for word in self.vocabulary:
@@ -56,12 +57,10 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
 
     def test(self, test_dataset_text):
         result = []
-        loglikelihood = {}
-        logprior = {}
 
         for i in range(2):  # pragma: no cover
             try:
-                logprior, loglikelihood, _ = self.train_data.load_from_disk()
+                self.logprior, self.loglikelihood, _ = self.train_data.load_from_disk()
                 print("Found Naive Bayes training data!")
                 break
             except FileNotFoundError:
@@ -74,29 +73,38 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
 
         for test in test_dataset_text:
             result.append(
-                find_class(
+                self.find_class(
                     test,
                     list(self.classes),
-                    logprior=logprior,
-                    loglikelihood=loglikelihood,
                 )
             )
         return result
 
+    def find_class(self, test_instance: str, classes: list):  # pragma: no cover
+        sum = {}
+        test_instance_list = Sanitizer(test_instance).sanitize_simple()
+        for c in classes:
+            sum[c] = self.logprior[c]
+            for word in test_instance_list:
+                try:
+                    sum[c] += self.loglikelihood[(word, c)]
+                except KeyError:
+                    continue
+        return utils.get_max_value_key(sum)
 
-def find_class(
-    test_instance: str, classes: list, logprior: dict, loglikelihood: dict
-):  # pragma: no cover
-    sum = {}
-    test_instance_list = Sanitizer(test_instance).sanitize_simple()
-    for c in classes:
-        sum[c] = logprior[c]
-        for word in test_instance_list:
-            try:
-                sum[c] += loglikelihood[(word, c)]
-            except KeyError:
-                continue
-    return utils.get_max_value_key(sum)
+    def extract_words_from_label(dataset: DatasetDict, label: str):
+        extracted_words = {}
+        sentences = utils.extract_sentences_from_label(dataset, label)
+
+        for s in sentences:
+            s = Sanitizer(s).sanitize_simple()
+            for word in s:
+                if word not in extracted_words:
+                    extracted_words[word] = 1
+                else:
+                    extracted_words[word] += 1
+
+        return extracted_words
 
 
 def count_words(words: dict, vocabulary: list):  # pragma: no cover

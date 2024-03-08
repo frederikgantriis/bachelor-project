@@ -11,22 +11,6 @@ def extract_sentences_from_label(dataset: DatasetDict, label: str):
 
     return extracted_sentences
 
-
-def extract_words_from_label(dataset: DatasetDict, label: str):
-    extracted_words = {}
-    sentences = extract_sentences_from_label(dataset, label)
-
-    for s in sentences:
-        s = Sanitizer(s).sanitize_simple()
-        for word in s:
-            if word not in extracted_words:
-                extracted_words[word] = 1
-            else:
-                extracted_words[word] += 1
-
-    return extracted_words
-
-
 def get_max_value_key(d: dict):
     max_value = max(d.values())
 
