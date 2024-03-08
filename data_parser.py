@@ -36,18 +36,22 @@ class Datasets(object):
         self.dataset = convert_dataset(nlp, datasets[dataset_type])
         print("spacy done converting...")
 
-    def unsanitized(self) -> dict[str, list]:
-        return self.dataset
+    def unsanitized(self):
+        return self
 
-    def without_stop_words(self) -> dict[str, list]:
-        """exlude stop words"""
+    def without_stop_words(self):
+        """exclude stop words"""
         new_dict = {}
         for key in self.dataset.keys():
             lst = []
             for value in self.dataset[key]:
                 lst.append(simple(value))
             new_dict[key] = lst
-        return new_dict
+        self.dataset = new_dict
+        return self
+
+    def to_dict(self) -> dict[str, list]:
+        return self.dataset
 
 
 def convert_dataset(nlp: Language, dataset: Dataset):

@@ -4,10 +4,9 @@ from models.naive_bayes import NaiveBayes
 
 if __name__ == "__main__":
     dataset_train = Datasets("train")
-    print(dataset_train.unsanitized()["OFF"][0])
-    print(dataset_train.without_stop_words()["OFF"][0])
-    print(dataset_train.unsanitized()["OFF"][0])
-    print(dataset_train.unsanitized()["OFF"][0])
+    print(dataset_train.unsanitized().to_dict()["OFF"][0])
+    print(dataset_train.unsanitized().without_stop_words().to_dict()["OFF"][0])
+    print(dataset_train.unsanitized().to_dict()["OFF"][0])
 
     # nb_type_2 = NaiveBayes(datasets.without_dots("train"))
 
