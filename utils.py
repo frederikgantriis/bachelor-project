@@ -1,23 +1,9 @@
 from os import name, system
-from datasets import DatasetDict
 
-
-def extract_sentences_from_label(dataset: DatasetDict, label: str):
-    extracted_sentences = []
-
-    for i in range(len(dataset["text"])):
-        if dataset["label"][i] == label:
-            extracted_sentences.append(dataset["text"][i])
-
-    return extracted_sentences
-
-
-def extract_words_from_label(dataset: DatasetDict, label: str):
+def extract_words_from_comments(comments):
     extracted_words = {}
-    sentences = extract_sentences_from_label(dataset, label)
 
-    for s in sentences:
-        s = Sanitizer(s).sanitize_simple()
+    for s in comments:
         for word in s:
             if word not in extracted_words:
                 extracted_words[word] = 1

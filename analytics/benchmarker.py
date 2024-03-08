@@ -1,14 +1,13 @@
 from pandas import concat
 from data_storage import StatsData
-from data_parser import get_test_dataset
 from constants import OFF, NOT
 from models.ml_algorithm import MLAlgorithm
 from utils import clear
 
 
 class Benchmarker(object):
-    def __init__(self, models: list[MLAlgorithm]) -> None:
-        self.dataset = get_test_dataset()
+    def __init__(self, models: list[MLAlgorithm], dataset) -> None:
+        self.dataset = dataset
         self.dataset_labels = self.dataset["label"]
         self.models = models
 

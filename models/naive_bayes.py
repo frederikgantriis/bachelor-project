@@ -1,13 +1,14 @@
+from ast import Dict, Set
 import math
 import utils
 
-from datasets import DatasetDict
+from data_parser import Dataset
 from models.ml_algorithm import MLAlgorithm
 from data_storage import TrainData
 
 
 class NaiveBayes(MLAlgorithm):  # pragma: no cover
-    def __init__(self, dataset: DatasetDict) -> None:  # pragma: no cover
+    def __init__(self, dataset: Dataset) -> None:  # pragma: no cover
         super().__init__(dataset)  # type: ignore
         # base chance based on the split in classes in the dataset
         self.logprior = {}
@@ -15,13 +16,12 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
         self.loglikelihood = {}
 
         # amount of instances aka. comments/sentences in the dataset
-        self.n_instances = len(dataset["text"])
+        self.n_instances = len(self.dataset["OFF"]) + len(self.dataset["NOT"])
 
-        # creates a list of all words in the dataset after sentences have been sanitized
-        self.vocabulary = utils.flatten(
-            [Sanitizer(comment).sanitize_simple()
-             for comment in self.dataset["text"]]
-        )
+        # creates a set of words in the dataset
+        self.vocabulary = set()
+        for comment in dataset.to_list():
+            self.vocabulary.update(comment)
 
         self.train_data = TrainData("naive-bayes")
 
@@ -29,14 +29,13 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
         return "naive-bayes"
 
     def train(self):  # pragma: no cover
-        c: str
         for c in self.classes:  # type: ignore
             # amount of instances with this class
-            n_classes = self.dataset["label"].count(c)
+            n_classes = len(self.dataset)
             # it gives a base chance for it being NOT or OFF based on the split in the dataset
             self.logprior[c] = math.log10(n_classes / self.n_instances)
 
-            words_in_class = utils.extract_words_from_label(self.dataset, c)
+            words_in_class = utils.extract_words_from_comments()(self.dataset[c])
             n_words = count_words(words_in_class, self.vocabulary)
 
             for word in self.vocabulary:
@@ -88,10 +87,9 @@ def find_class(
     test_instance: str, classes: list, logprior: dict, loglikelihood: dict
 ):  # pragma: no cover
     sum = {}
-    test_instance_list = Sanitizer(test_instance).sanitize_simple()
     for c in classes:
         sum[c] = logprior[c]
-        for word in test_instance_list:
+        for word in test_instance:
             try:
                 sum[c] += loglikelihood[(word, c)]
             except KeyError:
