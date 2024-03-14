@@ -35,7 +35,7 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
             # it gives a base chance for it being NOT or OFF based on the split in the dataset
             self.logprior[c] = math.log10(n_classes / self.n_instances)
 
-            words_in_class = utils.extract_words_from_comments()(self.dataset[c])
+            words_in_class = utils.extract_words_from_comments(self.dataset[c])
             n_words = count_words(words_in_class, self.vocabulary)
 
             for word in self.vocabulary:
