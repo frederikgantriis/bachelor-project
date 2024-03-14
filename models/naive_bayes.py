@@ -1,10 +1,10 @@
-from ast import Dict, Set
 import math
 import utils
 
 from data_parser import Dataset
 from models.ml_algorithm import MLAlgorithm
 from data_storage import TrainData
+from constants import OFF, NOT
 
 
 class NaiveBayes(MLAlgorithm):  # pragma: no cover
@@ -16,7 +16,7 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
         self.loglikelihood = {}
 
         # amount of instances aka. comments/sentences in the dataset
-        self.n_instances = len(self.dataset["OFF"]) + len(self.dataset["NOT"])
+        self.n_instances = len(self.dataset[OFF]) + len(self.dataset[NOT])
 
         # creates a set of words in the dataset
         self.vocabulary = set()

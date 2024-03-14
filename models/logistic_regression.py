@@ -14,7 +14,7 @@ class LogisticRegression(MLAlgorithm):
         self.hateful_words: set = set(
             pd.read_csv("./hurtlex_DA.tsv", sep="\t")["lemma"]
         )
-        self.data_length = len(self.dataset["OFF"]) + len(self.dataset["NOT"])
+        self.data_length = len(self.dataset[OFF]) + len(self.dataset[NOT])
 
     def sigmoid(self, x):
 
@@ -50,12 +50,12 @@ class LogisticRegression(MLAlgorithm):
         self.weights = [0, 0]
         self.bias_term = 0
         for i in permutation(self.data_length):
-            if i < len(self.dataset["OFF"]):
+            if i < len(self.dataset[OFF]):
                 expected = 0
-                comment = self.dataset["OFF"][i]
+                comment = self.dataset[OFF][i]
             else:
                 expected = 1
-                comment = self.dataset["NOT"][i - len(self.dataset["OFF"])]
+                comment = self.dataset[NOT][i - len(self.dataset[OFF])]
 
             features = self.calculate_feature_amount(comment)
             vector_product = [x * y for x, y in zip(self.weights, features)]
