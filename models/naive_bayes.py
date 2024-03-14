@@ -44,7 +44,7 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
                 # compute the likelihood of this word being generated from this class based on
                 # the amount of the word used in the class compared to the total amount of
                 # words used in the class.
-                self.loglikelihood[(word, c)] = math.log10(
+                self.loglikelihood[(word.text, c)] = math.log10(
                     (count + 1) / (n_words - count)
                 )
 
