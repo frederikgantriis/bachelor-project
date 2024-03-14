@@ -84,12 +84,12 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
 
 
 def find_class(
-    test_comment: str, classes: list, logprior: dict, loglikelihood: dict
+    comment: str, classes: list, logprior: dict, loglikelihood: dict
 ):  # pragma: no cover
     sum = {}
     for c in classes:
         sum[c] = logprior[c]
-        for word in test_comment:
+        for word in comment:
             try:
                 sum[c] += loglikelihood[(word, c)]
             except KeyError:

@@ -60,28 +60,28 @@ class Datasets(object):
         """remove all punctuation"""
         method: Callable[[list[Token]], list[Token]] = lambda lst: [
             x for x in lst if not x.pos_ == "PUNCT"]
-        self.dataset = sanitize_dict(self.dataset, method)
+        self.dataset = sanitize_dataset(self.dataset, method)
         return self
 
     def remove_stop_words(self):
         """remove the most common words in the danish language"""
         method: Callable[[list[Token]], list[Token]] = lambda lst: [
             x for x in lst if not x.is_stop]
-        self.dataset = sanitize_dict(self.dataset, method)
+        self.dataset = sanitize_dataset(self.dataset, method)
         return self
 
     def lemmatize(self):
         """group words together and convert to simplest form (see: https://en.wikipedia.org/wiki/Lemmatization)"""
         method: Callable[[list[Token]], list[Token]] = lambda lst: [x for x in self.nlp(" ".join([
             x.lemma_ for x in lst]))]
-        self.dataset = sanitize_dict(self.dataset, method)
+        self.dataset = sanitize_dataset(self.dataset, method)
         return self
 
     def lowercase(self):
         """lowercase wuhu"""
         method: Callable[[list[Token]], list[Token]] = lambda lst: [x for x in self.nlp(" ".join([
             x.lower_ for x in lst]))]
-        self.dataset = sanitize_dict(self.dataset, method)
+        self.dataset = sanitize_dataset(self.dataset, method)
         return self
 
 
@@ -107,11 +107,11 @@ def convert_dataset(nlp: Language, dataset: Dataset):
 
     return {"OFF": offensive_sentences, "NOT": not_offensive_sentences}
 
-def sanitize_dict(d, sanitze_func):
+def sanitize_dataset(dataset, sanitze_func):
     new_dict = {}
-    for key in d.keys():
+    for key in dataset.keys():
         lst = []
-        for value in d[key]:
+        for value in dataset[key]:
             lst.append(sanitze_func(value))
         new_dict[key] = lst
     return new_dict
