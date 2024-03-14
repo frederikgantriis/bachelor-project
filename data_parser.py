@@ -1,13 +1,12 @@
-from copy import deepcopy
 import os
 import sys
+import spacy
+
 from typing import Callable
 from datasets import load_dataset, load_from_disk, Dataset, DatasetDict
 from dotenv import load_dotenv
-import spacy
 from spacy.language import Language
 from spacy.tokens import Token
-
 from data_storage import DataStorage
 from utils import flatten
 

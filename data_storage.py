@@ -1,8 +1,9 @@
-from datetime import datetime
 import os
 import pickle
-from pandas import DataFrame
 import pandas
+
+from datetime import datetime
+from pandas import DataFrame
 
 
 class DataStorage(object):
