@@ -107,22 +107,11 @@ def convert_dataset(nlp: Language, dataset: Dataset):
 
     return {"OFF": offensive_sentences, "NOT": not_offensive_sentences}
 
-
-def retokenize(d: dict, nlp):
+def sanitize_dict(d, sanitze_func):
     new_dict = {}
     for key in d.keys():
         lst = []
         for value in d[key]:
-            lst.append(nlp(value))
-        new_dict[key] = lst
-    return new_dict
-
-
-def sanitize_dict(d, func):
-    new_dict = {}
-    for key in d.keys():
-        lst = []
-        for value in d[key]:
-            lst.append(func(value))
+            lst.append(sanitze_func(value))
         new_dict[key] = lst
     return new_dict

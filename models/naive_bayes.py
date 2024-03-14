@@ -71,10 +71,10 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
                 print("Naive Bayes training data not found:\nInitializing training...")
                 self.train()
 
-        for test in test_dataset_text:
+        for comment in test_dataset_text:
             result.append(
                 find_class(
-                    test,
+                    comment,
                     list(self.classes),
                     logprior=logprior,
                     loglikelihood=loglikelihood,
@@ -84,12 +84,12 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
 
 
 def find_class(
-    test_instance: str, classes: list, logprior: dict, loglikelihood: dict
+    test_comment: str, classes: list, logprior: dict, loglikelihood: dict
 ):  # pragma: no cover
     sum = {}
     for c in classes:
         sum[c] = logprior[c]
-        for word in test_instance:
+        for word in test_comment:
             try:
                 sum[c] += loglikelihood[(word, c)]
             except KeyError:
