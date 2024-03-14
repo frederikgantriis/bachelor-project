@@ -1,14 +1,13 @@
 from pandas import concat
-from data import StatsData
-from data_parser import get_test_dataset
+from data_storage import StatsData
 from constants import OFF, NOT
 from models.ml_algorithm import MLAlgorithm
 from utils import clear
 
 
 class Benchmarker(object):
-    def __init__(self, models: list[MLAlgorithm]) -> None:
-        self.dataset = get_test_dataset()
+    def __init__(self, models: list[MLAlgorithm], dataset) -> None:
+        self.dataset = dataset
         self.dataset_labels = self.dataset["label"]
         self.models = models
 
@@ -132,8 +131,10 @@ class Benchmarker(object):
                 result_labels = model.test(self.dataset["text"])
 
                 stats_average["f1"] += self.f1_score(result_labels)
-                stats_average["accuracy"] += self.calculate_accuracy(result_labels)
-                stats_average["precision"] += self.calculate_precision(result_labels)
+                stats_average["accuracy"] += self.calculate_accuracy(
+                    result_labels)
+                stats_average["precision"] += self.calculate_precision(
+                    result_labels)
                 stats_average["recall"] += self.calculate_recall(result_labels)
                 stats_average["true_positives"] += self.calculate_true_positives(
                     result_labels

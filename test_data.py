@@ -1,9 +1,9 @@
-from data import Data, StatsData, TrainData
+from data_storage import DataStorage, StatsData, TrainData
 from pandas import DataFrame
 
 
 def test_make_new_data_object():
-    data = Data("model_name")
+    data = DataStorage("model_name")
     assert data.model_name == "model_name"
 
 

@@ -1,11 +1,12 @@
-from datetime import datetime
 import os
 import pickle
-from pandas import DataFrame
 import pandas
 
+from datetime import datetime
+from pandas import DataFrame
 
-class Data(object):
+
+class DataStorage(object):
     def __init__(self) -> None:
         self.timestamp = datetime.now()
 
@@ -20,7 +21,7 @@ class Data(object):
             return pickle.load(f)
 
 
-class StatsData(Data):
+class StatsData(DataStorage):
     def __init__(self, model_name: str, **kwargs):
         """keyword args is optional
 
@@ -81,7 +82,7 @@ class StatsData(Data):
         return pandas.read_csv(self.disk_path)
 
 
-class TrainData(Data):
+class TrainData(DataStorage):
     def __init__(self, model_name: str, *parameters) -> None:
         super().__init__()
         self.model_name = model_name
@@ -95,22 +96,3 @@ class TrainData(Data):
 
     def load_from_disk(self):
         return super().load_from_disk(self.disk_path)
-
-
-class SanitizedTextData(Data):
-    def __init__(self, method: str, text_data: list[str]) -> None:
-        super().__init__()
-        self.folder_path = "data/text/"
-        self.disk_path = self.folder_path + method + ".pkl"
-
-        self.method = method
-        self.text_data = text_data
-
-    def save_to_disk(self):
-        return super().save_to_disk(self.text_data, self.folder_path, self.disk_path)
-
-    def load_from_disk(self):
-        return super().load_from_disk(self.disk_path)
-
-    def __repr__(self) -> str:
-        return

@@ -1,11 +1,12 @@
-from datasets import DatasetDict
+from data_parser import Dataset
+from constants import OFF, NOT
 
 
 class MLAlgorithm(object):  # pragma: no cover
-    def __init__(self, dataset: DatasetDict) -> None:
-        self.dataset = dataset
+    def __init__(self, dataset: Dataset) -> None:
+        self.dataset = dataset.to_dict()
         # set of unique classes in the dataset (i.e in our case "OFF" & "NOT")
-        self.classes = set(dataset["label"])
+        self.classes = [OFF, NOT]
 
     def train(self):
         """train the model and store the results"""
