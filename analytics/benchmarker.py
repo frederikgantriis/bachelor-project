@@ -3,12 +3,15 @@ from data_storage import StatsData
 from constants import OFF, NOT
 from models.ml_algorithm import MLAlgorithm
 from utils import clear
+from constants import OFF, NOT
 
 
 class Benchmarker(object):
     def __init__(self, models: list[MLAlgorithm], dataset) -> None:
         self.dataset = dataset
-        self.dataset_labels = self.dataset["label"]
+        self.dataset_labels = [OFF] * len(self.dataset.to_dict()[OFF]) + [NOT] * len(
+            self.dataset.to_dict()[NOT]
+        )
         self.models = models
 
     def f1_score(self, result_labels: list[str]) -> float:
@@ -128,13 +131,11 @@ class Benchmarker(object):
             for _ in range(repetitions):
                 print(f"Repetition: {_ + 1}/{repetitions}", end="\r")
 
-                result_labels = model.test(self.dataset["text"])
+                result_labels = model.test(self.dataset.to_list())
 
                 stats_average["f1"] += self.f1_score(result_labels)
-                stats_average["accuracy"] += self.calculate_accuracy(
-                    result_labels)
-                stats_average["precision"] += self.calculate_precision(
-                    result_labels)
+                stats_average["accuracy"] += self.calculate_accuracy(result_labels)
+                stats_average["precision"] += self.calculate_precision(result_labels)
                 stats_average["recall"] += self.calculate_recall(result_labels)
                 stats_average["true_positives"] += self.calculate_true_positives(
                     result_labels
