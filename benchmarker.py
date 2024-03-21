@@ -1,17 +1,18 @@
 from pyexpat import model
 from pandas import DataFrame, concat
 from data_storage import StatsData
-from constants import OFF, NOT
+from data_parser import Datasets
+from constants import OFF, NOT, TEST
 from models.ml_algorithm import MLAlgorithm
 from utils import clear, makedir
 import matplotlib.pyplot as plt
 
 
 class Benchmarker(object):
-    def __init__(self, models: list[MLAlgorithm], dataset) -> None:
-        self.dataset = dataset
-        self.dataset_labels = [OFF] * len(self.dataset.to_dict()[OFF]) + [NOT] * len(
-            self.dataset.to_dict()[NOT]
+    def __init__(self, models: list[(MLAlgorithm, Datasets)]) -> None:
+        test_dataset = Datasets(TEST)
+        self.dataset_labels = [OFF] * len(test_dataset.to_dict()[OFF]) + [NOT] * len(
+            test_dataset.to_dict()[NOT]
         )
         self.models = models
         self.benchmark = None
@@ -157,11 +158,11 @@ class Benchmarker(object):
                 "false_negatives": 0,
             }
 
-            print(f"Testing model: {model}")
+            print(f"Testing model: {model[0]}")
             for _ in range(repetitions):
                 print(f"Repetition: {_ + 1}/{repetitions}", end="\r")
 
-                result_labels = model.test(self.dataset.to_list())
+                result_labels = model[0].test(model[1].to_list())
 
                 stats_average["f1"] += self.f1_score(result_labels)
                 stats_average["accuracy"] += self.calculate_accuracy(result_labels)
@@ -184,7 +185,7 @@ class Benchmarker(object):
                 stats_average[key] = stats_average[key] / repetitions
 
             model_data = StatsData(
-                str(model),
+                str(model[0]),
                 f1=stats_average["f1"],
                 accuracy=stats_average["accuracy"],
                 precision=stats_average["precision"],
@@ -207,6 +208,8 @@ class Benchmarker(object):
             # Clear terminal
             clear()
 
+        data_frame.to_csv("data/models/stats/latest_benchmark.csv")
+        
         return data_frame
 
     def create_pie_chart(self, repetitions: int):
