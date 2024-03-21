@@ -32,7 +32,7 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
 
     def set_variation_name(self, name: str):
         self.variation_name = "_" + name
-        self.train_data = TrainData("naive-bayes" + "_" + self.variation_name)
+        self.train_data = TrainData("naive-bayes" + self.variation_name)
 
     def train(self):  # pragma: no cover
         for c in self.classes:  # type: ignore
