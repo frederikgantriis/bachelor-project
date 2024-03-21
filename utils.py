@@ -1,4 +1,5 @@
 from os import name, system
+import os
 
 def extract_words_from_comments(comments):
     extracted_words = {}
@@ -42,3 +43,8 @@ def clear():
     # for mac and linux(here, os.name is 'posix')
     else:
         _ = system('clear')
+
+
+def makedir(path: str):
+    if not os.path.exists(path):
+        os.makedirs(path)

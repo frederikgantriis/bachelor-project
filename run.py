@@ -24,4 +24,5 @@ if __name__ == "__main__":
         ],
         dataset_test,
     )
-    print(benchmarker.benchmark_models(30))
+
+    benchmarker.create_all_charts(10)
