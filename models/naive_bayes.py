@@ -75,6 +75,8 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
                 find_class(
                     comment,
                     list(self.classes),
+                    self.logprior,
+                    self.loglikelihood
                 )
             )
         return result
@@ -92,21 +94,6 @@ def find_class(
             except KeyError:
                 continue
     return utils.get_max_value_key(sum)
-
-    def extract_words_from_label(dataset: DatasetDict, label: str):
-        extracted_words = {}
-        sentences = utils.extract_sentences_from_label(dataset, label)
-
-        for s in sentences:
-            s = Sanitizer(s).sanitize_simple()
-            for word in s:
-                if word not in extracted_words:
-                    extracted_words[word] = 1
-                else:
-                    extracted_words[word] += 1
-
-        return extracted_words
-
 
 def count_words(words: dict, vocabulary: list):  # pragma: no cover
     sum = 0
