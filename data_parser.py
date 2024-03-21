@@ -28,25 +28,16 @@ class Datasets(object):
             load_dataset(
                 "DDSC/dkhate", token=os.getenv('HUGGING_FACE_ACCESS_TOKEN')).save_to_disk(dataset_path)
 
-        datasets: DatasetDict = load_from_disk(dataset_path)
+        self.datasets: DatasetDict = load_from_disk(dataset_path)
 
         # Unsanitized version of the dataset in a dict of lists of strings format.
         # MUST be sanitized to result in the correct format which is:
         # DICT of LISTS of LISTS of words
         self.nlp = spacy.load("da_core_news_sm")
-        storage = DataStorage()
-        folder_path = "data/spacy/"
-        disk_path = folder_path + dataset_type + ".pkl"
-
-        try:
-            self.dataset = storage.load_from_disk(disk_path)
-            print("Found tokenized dataset on disk!")
-        except FileNotFoundError:
-            print(
-                "No tokenized dataset on disk...\nTokenizing dataset using spacy and saving to disk...")
-            self.dataset = convert_dataset(self.nlp, datasets[dataset_type])
-            storage.save_to_disk(self.dataset, folder_path, disk_path)
-            print("Succesfully tokenized dataset and saved to disk!")
+        self.dataset_type = dataset_type
+        self.storage = DataStorage()
+        self.folder_path = "data/spacy/"
+        self._initial_sync_with_disk()
 
     def to_dict(self) -> dict[str, list]:
         """Returns:
@@ -59,60 +50,115 @@ class Datasets(object):
 
     def remove_dots(self):
         """remove all punctuation"""
+
+        # try getting the dataset variation from cache
+        self.dataset_type = self.dataset_type + "_remove-dots"
+        if self._try_load_from_disk():
+            return self
+
         method: Callable[[list[Token]], list[Token]] = lambda lst: [
             x for x in lst if not x.pos_ == "PUNCT"]
-        self.dataset = sanitize_dataset(self.dataset, method)
+        self.dataset = self._sanitize_dataset(self.dataset, method)
+
+        # save to disk for quicker execution next time
+        self._save_to_disk()
         return self
 
     def remove_stop_words(self):
         """remove the most common words in the danish language"""
+        self.dataset_type = self.dataset_type + "_remove-stop-words"
+        if self._try_load_from_disk():
+            return self
+
         method: Callable[[list[Token]], list[Token]] = lambda lst: [
             x for x in lst if not x.is_stop]
-        self.dataset = sanitize_dataset(self.dataset, method)
+        self.dataset = self._sanitize_dataset(self.dataset, method)
+
+        self._save_to_disk()
         return self
 
     def lemmatize(self):
         """group words together and convert to simplest form (see: https://en.wikipedia.org/wiki/Lemmatization)"""
+        self.dataset_type = self.dataset_type + "_lemmatize"
+        if self._try_load_from_disk():
+            return self
+
         method: Callable[[list[Token]], list[Token]] = lambda lst: [x for x in self.nlp(" ".join([
             x.lemma_ for x in lst]))]
-        self.dataset = sanitize_dataset(self.dataset, method)
+        self.dataset = self._sanitize_dataset(self.dataset, method)
+        self._save_to_disk()
         return self
 
     def lowercase(self):
         """lowercase wuhu"""
+        self.dataset_type = self.dataset_type + "_lowercase"
+        if self._try_load_from_disk():
+            return self
+
         method: Callable[[list[Token]], list[Token]] = lambda lst: [x for x in self.nlp(" ".join([
             x.lower_ for x in lst]))]
-        self.dataset = sanitize_dataset(self.dataset, method)
+        self.dataset = self._sanitize_dataset(self.dataset, method)
+        self._save_to_disk()
         return self
 
+    def _convert_dataset(self, nlp: Language, dataset: Dataset):
+        """converts a hugginface dataset into the dataset type accepted by our models
 
-def convert_dataset(nlp: Language, dataset: Dataset):
-    """converts a hugginface dataset into the dataset type accepted by our models
+        Args:
+            dataset (Dataset): train or test dataset from huggingface
 
-    Args:
-        dataset (Dataset): train or test dataset from huggingface
+        Returns:
+            dict[str, list]: keys = label/classification, values = sentences in classification
+        """
+        offensive_sentences = []
+        not_offensive_sentences = []
 
-    Returns:
-        dict[str, list]: keys = label/classification, values = sentences in classification
-    """
-    offensive_sentences = []
-    not_offensive_sentences = []
+        for item in list(zip(dataset["text"], dataset["label"])):
+            doc = nlp(item[0])
 
-    for item in list(zip(dataset["text"], dataset["label"])):
-        doc = nlp(item[0])
+            if item[1] == OFF:
+                offensive_sentences.append(doc)
+            else:
+                not_offensive_sentences.append(doc)
 
-        if item[1] == OFF:
-            offensive_sentences.append(doc)
-        else:
-            not_offensive_sentences.append(doc)
+        return {OFF: offensive_sentences, NOT: not_offensive_sentences}
 
-    return {OFF: offensive_sentences, NOT: not_offensive_sentences}
+    def _sanitize_dataset(self, dataset, sanitize_func):
+        new_dict = {}
+        for key in dataset.keys():
+            lst = []
+            for value in dataset[key]:
+                lst.append(
+                    self.nlp(" ".join([x.text for x in sanitize_func(value)])))
+            new_dict[key] = lst
+        return new_dict
 
-def sanitize_dataset(dataset, sanitze_func):
-    new_dict = {}
-    for key in dataset.keys():
-        lst = []
-        for value in dataset[key]:
-            lst.append(sanitze_func(value))
-        new_dict[key] = lst
-    return new_dict
+    def _initial_sync_with_disk(self):
+        disk_path = self.folder_path + self.dataset_type + ".pkl"
+
+        try:
+            self.dataset = self.storage.load_from_disk(disk_path)
+            print("Found tokenized dataset on disk!")
+        except FileNotFoundError:
+            print(
+                "No tokenized dataset on disk...\nTokenizing dataset using spacy and saving to disk...")
+            self.dataset = self._convert_dataset(
+                self.nlp, self.datasets[self.dataset_type])
+            self.storage.save_to_disk(
+                self.dataset, self.folder_path, disk_path)
+            print("Succesfully tokenized dataset and saved to disk!")
+
+    def _try_load_from_disk(self):
+        disk_path = self.folder_path + self.dataset_type + ".pkl"
+
+        try:
+            self.dataset = self.storage.load_from_disk(disk_path)
+            print("Found tokenized dataset on disk of type:", self.dataset_type)
+            return True
+        except FileNotFoundError:
+            print("No tokenized dataset on disk of type:", self.dataset_type)
+            return False
+
+    def _save_to_disk(self):
+        disk_path = self.folder_path + self.dataset_type + ".pkl"
+        self.storage.save_to_disk(self.dataset, self.folder_path, disk_path)
