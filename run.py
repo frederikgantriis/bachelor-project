@@ -2,6 +2,7 @@ from data_parser import Datasets
 from models.logistic_regression import LogisticRegression
 from models.naive_bayes import NaiveBayes
 from models.baseline_random import BaselineRandom
+from models.binary_naive_bayes import Binary_naive_bayes
 from benchmarker import Benchmarker
 from constants import TRAIN, TEST
 

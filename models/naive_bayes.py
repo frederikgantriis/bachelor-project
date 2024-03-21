@@ -61,12 +61,10 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
 
     def test(self, test_dataset_text):
         result = []
-        loglikelihood = {}
-        logprior = {}
 
         for i in range(2):  # pragma: no cover
             try:
-                logprior, loglikelihood, _ = self.train_data.load_from_disk()
+                self.logprior, self.loglikelihood, _ = self.train_data.load_from_disk()
                 print("Found Naive Bayes training data!")
                 break
             except FileNotFoundError:
@@ -82,8 +80,8 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
                 find_class(
                     comment,
                     list(self.classes),
-                    logprior=logprior,
-                    loglikelihood=loglikelihood,
+                    self.logprior,
+                    self.loglikelihood
                 )
             )
         return result
@@ -101,7 +99,6 @@ def find_class(
             except KeyError:
                 continue
     return utils.get_max_value_key(sum)
-
 
 def count_words(words: dict, vocabulary: list):  # pragma: no cover
     sum = 0
