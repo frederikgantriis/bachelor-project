@@ -126,9 +126,7 @@ class Benchmarker(object):
 
         return counter
 
-    def benchmark_models(
-        self, repetitions: int, model_index: int
-    ):  # pragma: no cover
+    def benchmark_models(self, repetitions: int, model_index: int):  # pragma: no cover
         """tests each model, saves the result to data/models/stats and returns a data-frame containing all test-results
 
         Args:
