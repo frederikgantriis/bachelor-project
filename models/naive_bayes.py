@@ -5,6 +5,7 @@ from data_parser import Dataset
 from models.ml_algorithm import MLAlgorithm
 from data_storage import TrainData
 from constants import OFF, NOT
+from spacy.tokens import Token, Doc
 
 
 class NaiveBayes(MLAlgorithm):  # pragma: no cover
@@ -19,14 +20,19 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
         self.n_instances = len(self.dataset[OFF]) + len(self.dataset[NOT])
 
         # creates a set of words in the dataset
-        self.vocabulary = set()
+        self.vocabulary: set[Token] = set()
         for comment in dataset.to_list():
             self.vocabulary.update(comment)
 
         self.train_data = TrainData("naive-bayes")
+        self.variation_name = ""
 
     def __str__(self) -> str:
-        return "naive-bayes"
+        return "naive-bayes" + self.variation_name
+
+    def set_variation_name(self, name: str):
+        self.variation_name = "_" + name
+        self.train_data = TrainData("naive-bayes" + self.variation_name)
 
     def train(self):  # pragma: no cover
         for c in self.classes:  # type: ignore
@@ -55,12 +61,10 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
 
     def test(self, test_dataset_text):
         result = []
-        loglikelihood = {}
-        logprior = {}
 
         for i in range(2):  # pragma: no cover
             try:
-                logprior, loglikelihood, _ = self.train_data.load_from_disk()
+                self.logprior, self.loglikelihood, _ = self.train_data.load_from_disk()
                 print("Found Naive Bayes training data!")
                 break
             except FileNotFoundError:
@@ -76,26 +80,25 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
                 find_class(
                     comment,
                     list(self.classes),
-                    logprior=logprior,
-                    loglikelihood=loglikelihood,
+                    self.logprior,
+                    self.loglikelihood
                 )
             )
         return result
 
 
 def find_class(
-    comment: str, classes: list, logprior: dict, loglikelihood: dict
+    comment: Doc, classes: list, logprior: dict, loglikelihood: dict
 ):  # pragma: no cover
     sum = {}
     for c in classes:
         sum[c] = logprior[c]
         for word in comment:
             try:
-                sum[c] += loglikelihood[(word, c)]
+                sum[c] += loglikelihood[(word.text, c)]
             except KeyError:
                 continue
     return utils.get_max_value_key(sum)
-
 
 def count_words(words: dict, vocabulary: list):  # pragma: no cover
     sum = 0
