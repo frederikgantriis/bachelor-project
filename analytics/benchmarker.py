@@ -9,9 +9,11 @@ import matplotlib.pyplot as plt
 
 
 class Benchmarker(object):
-    def __init__(self, models: list[MLAlgorithm]) -> None:
-        self.dataset = get_test_dataset()
-        self.dataset_labels = self.dataset["label"]
+    def __init__(self, models: list[MLAlgorithm], dataset) -> None:
+        self.dataset = dataset
+        self.dataset_labels = [OFF] * len(self.dataset.to_dict()[OFF]) + [NOT] * len(
+            self.dataset.to_dict()[NOT]
+        )
         self.models = models
         self.benchmark = None
 
@@ -162,7 +164,7 @@ class Benchmarker(object):
             for _ in range(repetitions):
                 print(f"Repetition: {_ + 1}/{repetitions}", end="\r")
 
-                result_labels = model.test(self.dataset["text"])
+                result_labels = model.test(self.dataset.to_list())
 
                 stats_average["f1"] += self.f1_score(result_labels)
                 stats_average["accuracy"] += self.calculate_accuracy(result_labels)

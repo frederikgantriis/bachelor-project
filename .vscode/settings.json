@@ -2,7 +2,7 @@
   "python.analysis.autoImportCompletions": true,
   "python.analysis.completeFunctionParens": true,
   "python.analysis.inlayHints.functionReturnTypes": true,
-  "python.analysis.inlayHints.variableTypes": true,
+  // "python.analysis.inlayHints.variableTypes": true,
   "python.analysis.enablePytestSupport": true,
   "editor.formatOnSave": true,
   "python.testing.pytestArgs": [
