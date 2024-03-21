@@ -2,7 +2,7 @@ from data_parser import Datasets
 from models.logistic_regression import LogisticRegression
 from models.naive_bayes import NaiveBayes
 from models.baseline_random import BaselineRandom
-from analytics.benchmarker import Benchmarker
+from benchmarker import Benchmarker
 from constants import TRAIN, TEST
 
 if __name__ == "__main__":
