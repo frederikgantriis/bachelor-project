@@ -51,7 +51,7 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
                 # the amount of the word used in the class compared to the total amount of
                 # words used in the class.
                 self.loglikelihood[(word.text, c)] = math.log10(
-                    (count + 1) / (n_words - count)
+                    (count + 1) / (n_words - count + 1)
                 )
 
             # update the train data parameters
@@ -99,6 +99,7 @@ def find_class(
             except KeyError:
                 continue
     return utils.get_max_value_key(sum)
+
 
 def count_words(words: dict, vocabulary: list):  # pragma: no cover
     sum = 0

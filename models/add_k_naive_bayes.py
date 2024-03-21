@@ -1,16 +1,17 @@
-
 from data_parser import Dataset
-from models.naive_bayes import NaiveBayes, count_words
-from spacy.tokens import Token, Doc
 from data_storage import TrainData
+from models.naive_bayes import NaiveBayes, count_words
 import math
 import utils
 
 
-class BinaryNaiveBayes(NaiveBayes):
+class AddKNaiveBayes(NaiveBayes):
     def __init__(self, dataset: Dataset) -> None:
         super().__init__(dataset)
-        self.train_data = TrainData("binary-naive-bayes")
+        self.train_data = TrainData("add-k-naive-bayes")
+
+    def __str__(self) -> str:
+        return "Add-k-naive-bayes"
 
     def train(self):  # pragma: no cover
         for c in self.classes:  # type: ignore
@@ -19,10 +20,7 @@ class BinaryNaiveBayes(NaiveBayes):
             # it gives a base chance for it being NOT or OFF based on the split in the dataset
             self.logprior[c] = math.log10(n_classes / self.n_instances)
 
-            # Changed from base: Only counts words ones pr comment
-            words_in_class = utils.extract_unique_words_from_comments(
-                self.dataset[c])
-
+            words_in_class = utils.extract_words_from_comments(self.dataset[c])
             n_words = count_words(words_in_class, self.vocabulary)
 
             for word in self.vocabulary:
@@ -32,30 +30,11 @@ class BinaryNaiveBayes(NaiveBayes):
                 # the amount of the word used in the class compared to the total amount of
                 # words used in the class.
                 self.loglikelihood[(word.text, c)] = math.log10(
-                    (count + 1) / (n_words - count)
+                    # Changed from base: Smothing factor changed from 1 to 0.5
+                    (count + 0.5) / (n_words - count + 0.5)
                 )
 
             # update the train data parameters
             self.train_data.parameters = self.logprior, self.loglikelihood, self.classes
             # save the train data to disk
             self.train_data.save_to_disk()
-
-    def find_class(
-        comment: Doc, classes: list, logprior: dict, loglikelihood: dict
-    ):  # pragma: no cover
-        sum = {}
-        for c in classes:
-            sum[c] = logprior[c]
-            seen_words = []
-            for word in comment:
-                # Changed from base: Only counts words ones pr comment
-                if word not in seen_words:
-                    seen_words.append(word)
-                    try:
-                        sum[c] += loglikelihood[(word.text, c)]
-                    except KeyError:
-                        continue
-        return utils.get_max_value_key(sum)
-
-    def __str__(self) -> str:
-        return "binary-naive-bayes"
