@@ -9,11 +9,12 @@ from spacy.language import Language
 from spacy.tokens import Token
 from data_storage import DataStorage
 from utils import flatten
+from constants import OFF, NOT, TEST, TRAIN
 
 
 class Datasets(object):
     def __init__(self, dataset_type: str) -> None:
-        if dataset_type != "train" and dataset_type != "test":
+        if dataset_type not in [TRAIN, TEST]:
             raise ValueError(
                 "ERROR in Datasets(dataset_type: str): dataset_type argument must be either 'train' or 'test'")
         # Load environment variables from .env file
@@ -100,12 +101,12 @@ def convert_dataset(nlp: Language, dataset: Dataset):
     for item in list(zip(dataset["text"], dataset["label"])):
         doc = nlp(item[0])
 
-        if item[1] == "OFF":
+        if item[1] == OFF:
             offensive_sentences.append(doc)
         else:
             not_offensive_sentences.append(doc)
 
-    return {"OFF": offensive_sentences, "NOT": not_offensive_sentences}
+    return {OFF: offensive_sentences, NOT: not_offensive_sentences}
 
 def sanitize_dataset(dataset, sanitze_func):
     new_dict = {}
