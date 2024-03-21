@@ -15,6 +15,7 @@ class Benchmarker(object):
         )
         self.models = models
         self.benchmark = None
+        self.repetitions = 0
 
     def create_all_charts(self, repetitions: int):
         """Create all the charts for the models
@@ -31,8 +32,9 @@ class Benchmarker(object):
         self.create_pie_chart(repetitions)
 
     def _get_benchmark(self, repetitions: int):
-        if self.benchmark is None:
-            self.benchmark = self.benchmark_models(repetitions)
+        if self.benchmark is None or repetitions != self.repetitions:
+            self.benchmark = self.benchmark_models(repetitions, None)
+            self.repetitions = repetitions
 
         return self.benchmark
 
@@ -124,10 +126,7 @@ class Benchmarker(object):
 
         return counter
 
-    def benchmark_models(self, repetitions: int):  # pragma: no cover
-        return self.benchmark_models_with_index(repetitions, None)
-
-    def benchmark_models_with_index(
+    def benchmark_models(
         self, repetitions: int, model_index: int
     ):  # pragma: no cover
         """tests each model, saves the result to data/models/stats and returns a data-frame containing all test-results
@@ -363,7 +362,7 @@ class Benchmarker(object):
             recall = []
 
             for _ in range(repetitions):
-                model_benchmark = self.benchmark_models_with_index(1, i)
+                model_benchmark = self.benchmark_models(1, i)
                 f1_scores.append(model_benchmark["f1"].values[0])
                 accuracy.append(model_benchmark["accuracy"].values[0])
                 precision.append(model_benchmark["precision"].values[0])
