@@ -5,6 +5,7 @@ from data_parser import Dataset
 from models.ml_algorithm import MLAlgorithm
 from data_storage import TrainData
 from constants import OFF, NOT
+from spacy.tokens import Token, Doc
 
 
 class NaiveBayes(MLAlgorithm):  # pragma: no cover
@@ -19,7 +20,7 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
         self.n_instances = len(self.dataset[OFF]) + len(self.dataset[NOT])
 
         # creates a set of words in the dataset
-        self.vocabulary = set()
+        self.vocabulary: set[Token] = set()
         for comment in dataset.to_list():
             self.vocabulary.update(comment)
 
@@ -80,14 +81,14 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
 
 
 def find_class(
-    comment: str, classes: list, logprior: dict, loglikelihood: dict
+    comment: Doc, classes: list, logprior: dict, loglikelihood: dict
 ):  # pragma: no cover
     sum = {}
     for c in classes:
         sum[c] = logprior[c]
         for word in comment:
             try:
-                sum[c] += loglikelihood[(word, c)]
+                sum[c] += loglikelihood[(word.text, c)]
             except KeyError:
                 continue
     return utils.get_max_value_key(sum)
