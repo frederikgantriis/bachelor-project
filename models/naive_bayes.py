@@ -1,14 +1,14 @@
 import math
 import utils
 
-from datasets import DatasetDict
+from data_parser import Dataset
 from models.ml_algorithm import MLAlgorithm
-from data import TrainData
-from sanitizer import Sanitizer
+from data_storage import TrainData
+from constants import OFF, NOT
 
 
 class NaiveBayes(MLAlgorithm):  # pragma: no cover
-    def __init__(self, dataset: DatasetDict) -> None:  # pragma: no cover
+    def __init__(self, dataset: Dataset) -> None:  # pragma: no cover
         super().__init__(dataset)  # type: ignore
         # base chance based on the split in classes in the dataset
         self.logprior = {}
@@ -16,13 +16,12 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
         self.loglikelihood = {}
 
         # amount of instances aka. comments/sentences in the dataset
-        self.n_instances = len(dataset["text"])
+        self.n_instances = len(self.dataset[OFF]) + len(self.dataset[NOT])
 
-        # creates a list of all words in the dataset after sentences have been sanitized
-        self.vocabulary = utils.flatten(
-            [Sanitizer(comment).sanitize_simple()
-             for comment in self.dataset["text"]]
-        )
+        # creates a set of words in the dataset
+        self.vocabulary = set()
+        for comment in dataset.to_list():
+            self.vocabulary.update(comment)
 
         self.train_data = TrainData("naive-bayes")
 
@@ -30,14 +29,13 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
         return "naive-bayes"
 
     def train(self):  # pragma: no cover
-        c: str
         for c in self.classes:  # type: ignore
             # amount of instances with this class
-            n_classes = self.dataset["label"].count(c)
+            n_classes = len(self.dataset)
             # it gives a base chance for it being NOT or OFF based on the split in the dataset
             self.logprior[c] = math.log10(n_classes / self.n_instances)
 
-            words_in_class = self.extract_words_from_label(self.dataset, c)
+            words_in_class = utils.extract_words_from_comments(self.dataset[c])
             n_words = count_words(words_in_class, self.vocabulary)
 
             for word in self.vocabulary:
@@ -46,7 +44,7 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
                 # compute the likelihood of this word being generated from this class based on
                 # the amount of the word used in the class compared to the total amount of
                 # words used in the class.
-                self.loglikelihood[(word, c)] = math.log10(
+                self.loglikelihood[(word.text, c)] = math.log10(
                     (count + 1) / (n_words - count)
                 )
 
@@ -71,26 +69,28 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
                 print("Naive Bayes training data not found:\nInitializing training...")
                 self.train()
 
-        for test in test_dataset_text:
+        for comment in test_dataset_text:
             result.append(
-                self.find_class(
-                    test,
+                find_class(
+                    comment,
                     list(self.classes),
                 )
             )
         return result
 
-    def find_class(self, test_instance: str, classes: list):  # pragma: no cover
-        sum = {}
-        test_instance_list = Sanitizer(test_instance).sanitize_simple()
-        for c in classes:
-            sum[c] = self.logprior[c]
-            for word in test_instance_list:
-                try:
-                    sum[c] += self.loglikelihood[(word, c)]
-                except KeyError:
-                    continue
-        return utils.get_max_value_key(sum)
+
+def find_class(
+    comment: str, classes: list, logprior: dict, loglikelihood: dict
+):  # pragma: no cover
+    sum = {}
+    for c in classes:
+        sum[c] = logprior[c]
+        for word in comment:
+            try:
+                sum[c] += loglikelihood[(word, c)]
+            except KeyError:
+                continue
+    return utils.get_max_value_key(sum)
 
     def extract_words_from_label(dataset: DatasetDict, label: str):
         extracted_words = {}

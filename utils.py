@@ -1,15 +1,18 @@
-from datasets import DatasetDict
-from sanitizer import Sanitizer
+from os import name, system
+import os
 
+def extract_words_from_comments(comments):
+    extracted_words = {}
 
-def extract_sentences_from_label(dataset: DatasetDict, label: str):
-    extracted_sentences = []
+    for s in comments:
+        for word in s:
+            if word not in extracted_words:
+                extracted_words[word] = 1
+            else:
+                extracted_words[word] += 1
 
-    for i in range(len(dataset["text"])):
-        if dataset["label"][i] == label:
-            extracted_sentences.append(dataset["text"][i])
+    return extracted_words
 
-    return extracted_sentences
 
 def get_max_value_key(d: dict):
     max_value = max(d.values())
@@ -29,3 +32,19 @@ def flatten(matrix: list) -> list:
         list: 1d list
     """
     return [item for row in matrix for item in row]
+
+
+def clear():
+
+    # for windows
+    if name == 'nt':
+        _ = system('cls')
+
+    # for mac and linux(here, os.name is 'posix')
+    else:
+        _ = system('clear')
+
+
+def makedir(path: str):
+    if not os.path.exists(path):
+        os.makedirs(path)

@@ -1,13 +1,11 @@
 import math
 import pandas as pd
-import utils
 import decimal
 
 from numpy.random import permutation
-from datasets import DatasetDict, Dataset
+from datasets import DatasetDict
 from models.ml_algorithm import MLAlgorithm
 from constants import OFF, NOT
-from sanitizer import Sanitizer
 
 
 class LogisticRegression(MLAlgorithm):
@@ -16,14 +14,7 @@ class LogisticRegression(MLAlgorithm):
         self.hateful_words: set = set(
             pd.read_csv("./hurtlex_DA.tsv", sep="\t")["lemma"]
         )
-        self.comments = self.dataset["text"]
-        self.expected = self.dataset["label"]
-
-        self.comments = [
-            Sanitizer(comment).sanitize_simple() for comment in self.dataset["text"]
-        ]
-
-        self.expected = [0 if label == OFF else 1 for label in self.expected]
+        self.data_length = len(self.dataset[OFF]) + len(self.dataset[NOT])
 
     def sigmoid(self, x):
 
@@ -32,8 +23,8 @@ class LogisticRegression(MLAlgorithm):
         z = y ** (-x)
         return float(1 / (1 + z))
 
-    def is_hateful(self, word: str) -> int:
-        return int(word.lower() in self.hateful_words)
+    def is_hateful(self, word: str) -> bool:
+        return word.lower() in self.hateful_words
 
     def crossentropy_loss(self, guess, expected):
         return -(expected * math.log(guess) + (1 - expected) * math.log(1 - guess))
@@ -46,7 +37,8 @@ class LogisticRegression(MLAlgorithm):
             loss (float): A number giving value to how far the guess is from the right answer
             trainingspeed (float): Dictates how fast the weights change
         """
-        new_weights = [(loss * feature) * (-trainingspeed) for feature in features]
+        new_weights = [(loss * feature) * (-trainingspeed)
+                       for feature in features]
 
         result = [x + y for x, y in zip(self.weights, new_weights)]
 
@@ -57,11 +49,18 @@ class LogisticRegression(MLAlgorithm):
         """Resets weights and bias term, then train model on all comments in a random order"""
         self.weights = [0, 0]
         self.bias_term = 0
-        for i in permutation(len(self.comments)):
-            features = self.calculate_feature_amount(self.comments[i])
+        for i in permutation(self.data_length):
+            if i < len(self.dataset[OFF]):
+                expected = 0
+                comment = self.dataset[OFF][i]
+            else:
+                expected = 1
+                comment = self.dataset[NOT][i - len(self.dataset[OFF])]
+
+            features = self.calculate_feature_amount(comment)
             vector_product = [x * y for x, y in zip(self.weights, features)]
             guess = self.sigmoid(sum(vector_product) + self.bias_term)
-            self.gradient_descent(features, guess - self.expected[i], 0.1)
+            self.gradient_descent(features, guess - expected, 0.1)
 
     def calculate_feature_amount(self, comment):
         """Assigns value to each feature based on comment then asignes their weight. Then normalises the output.
@@ -73,9 +72,8 @@ class LogisticRegression(MLAlgorithm):
             list[int]: List of features amount ex. amount of hate words
         """
         features = [0, 0]
-
         for word in comment:
-            if self.is_hateful(word):
+            if self.is_hateful(word.text):
                 features[0] += 1
             else:
                 features[1] += 1
@@ -86,10 +84,7 @@ class LogisticRegression(MLAlgorithm):
         result = []
         self.train()
 
-        test_comments = [
-            Sanitizer(comment).sanitize_simple() for comment in test_dataset_text
-        ]
-        for test in test_comments:
+        for test in test_dataset_text:
             features = self.calculate_feature_amount(test)
             vector_product = [x * y for x, y in zip(self.weights, features)]
             guess = self.sigmoid(sum(vector_product) + self.bias_term)
