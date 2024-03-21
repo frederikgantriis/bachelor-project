@@ -7,7 +7,7 @@ import math
 import utils
 
 
-class Binary_naive_bayes(NaiveBayes):
+class BinaryNaiveBayes(NaiveBayes):
     def __init__(self, dataset: Dataset) -> None:
         super().__init__(dataset)
         self.train_data = TrainData("binary-naive-bayes")
@@ -18,10 +18,11 @@ class Binary_naive_bayes(NaiveBayes):
             n_classes = len(self.dataset)
             # it gives a base chance for it being NOT or OFF based on the split in the dataset
             self.logprior[c] = math.log10(n_classes / self.n_instances)
-            
-            #Changed from base: Only counts words ones pr comment     
-            words_in_class = utils.extract_unique_words_from_comments(self.dataset[c]) 
-            
+
+            # Changed from base: Only counts words ones pr comment
+            words_in_class = utils.extract_unique_words_from_comments(
+                self.dataset[c])
+
             n_words = count_words(words_in_class, self.vocabulary)
 
             for word in self.vocabulary:
@@ -40,14 +41,14 @@ class Binary_naive_bayes(NaiveBayes):
             self.train_data.save_to_disk()
 
     def find_class(
-    comment: Doc, classes: list, logprior: dict, loglikelihood: dict
-):  # pragma: no cover
+        comment: Doc, classes: list, logprior: dict, loglikelihood: dict
+    ):  # pragma: no cover
         sum = {}
         for c in classes:
             sum[c] = logprior[c]
             seen_words = []
             for word in comment:
-                #Changed from base: Only counts words ones pr comment   
+                # Changed from base: Only counts words ones pr comment
                 if word not in seen_words:
                     seen_words.append(word)
                     try:
@@ -55,6 +56,6 @@ class Binary_naive_bayes(NaiveBayes):
                     except KeyError:
                         continue
         return utils.get_max_value_key(sum)
-    
+
     def __str__(self) -> str:
         return "binary-naive-bayes"

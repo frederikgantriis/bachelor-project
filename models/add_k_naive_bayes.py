@@ -5,7 +5,7 @@ import math
 import utils
 
 
-class Add_k_naive_bayes(NaiveBayes):
+class AddKNaiveBayes(NaiveBayes):
     def __init__(self, dataset: Dataset) -> None:
         super().__init__(dataset)
         self.train_data = TrainData("add-k-naive-bayes")
@@ -30,7 +30,8 @@ class Add_k_naive_bayes(NaiveBayes):
                 # the amount of the word used in the class compared to the total amount of
                 # words used in the class.
                 self.loglikelihood[(word.text, c)] = math.log10(
-                    (count + 0.5) / (n_words - count + 0.5) #Changed from base: Smothing factor changed from 1 to 0.5
+                    # Changed from base: Smothing factor changed from 1 to 0.5
+                    (count + 0.5) / (n_words - count + 0.5)
                 )
 
             # update the train data parameters
