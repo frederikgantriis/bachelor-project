@@ -4,8 +4,8 @@ import os
 def extract_words_from_comments(comments):
     extracted_words = {}
 
-    for s in comments:
-        for word in s:
+    for comment in comments:
+        for word in comment:
             if word not in extracted_words:
                 extracted_words[word] = 1
             else:
@@ -13,6 +13,21 @@ def extract_words_from_comments(comments):
 
     return extracted_words
 
+def extract_unique_words_from_comments(comments):
+    extracted_words = {}
+    
+
+    for comment in comments:
+        seen_words = []
+        for word in comment:
+            if word not in seen_words: 
+                seen_words.append(word)          
+                if word not in extracted_words:
+                    extracted_words[word] = 1
+                else:
+                    extracted_words[word] += 1
+
+    return extracted_words
 
 def get_max_value_key(d: dict):
     max_value = max(d.values())
