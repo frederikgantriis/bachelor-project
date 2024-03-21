@@ -7,22 +7,14 @@ from constants import TRAIN, TEST
 
 if __name__ == "__main__":
     dataset_train = Datasets(TRAIN)
-    dataset_train.remove_dots()
+    dataset_train_2 = Datasets(TRAIN).remove_dots().remove_stop_words()
 
     dataset_test = Datasets(TEST)
-    dataset_test.remove_dots().lemmatize().lowercase().remove_stop_words()
-    nb1 = NaiveBayes(dataset_train)
-    nb1.test(dataset_test.to_list())
-    lr = LogisticRegression(dataset_train)
-    lr.test(dataset_test.to_list())
 
-    benchmarker = Benchmarker(
-        [
-            NaiveBayes(dataset_train),
-            LogisticRegression(dataset_train),
-            BaselineRandom(dataset_train),
-        ],
-        dataset_test,
-    )
+    naive_bayes_1 = NaiveBayes(dataset_train)
+    naive_bayes_2 = NaiveBayes(dataset_train_2)
+    naive_bayes_2.set_variation_name("no-dots-no-stop-words")
 
-    benchmarker.create_all_charts(10)
+    benchmarker = Benchmarker([naive_bayes_1, naive_bayes_2], dataset_test)
+
+    print(benchmarker.benchmark_models(10, None))
