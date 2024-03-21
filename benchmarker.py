@@ -127,13 +127,14 @@ class Benchmarker(object):
         return counter
 
     def benchmark_models(self, repetitions: int, model_index: int):  # pragma: no cover
-        """tests each model, saves the result to data/models/stats and returns a data-frame containing all test-results
+        """Benchmarks all models initialized in the Benchmarker class
 
         Args:
-            models (list): list of all the models
+            repetitions (int): amount of times to test the model
+            model_index (int): optional index of the model to test (None if all models should be tested)
 
         Returns:
-            DataFrame: A DataFrame containing all the test-results from the different models
+            DataFrame: a dataframe with the benchmark data
         """
 
         if model_index is not None:
