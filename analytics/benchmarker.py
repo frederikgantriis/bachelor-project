@@ -1,7 +1,6 @@
 from pyexpat import model
 from pandas import DataFrame, concat
-from data import StatsData
-from data_parser import get_test_dataset
+from data_storage import StatsData
 from constants import OFF, NOT
 from models.ml_algorithm import MLAlgorithm
 from utils import clear, makedir
@@ -31,11 +30,10 @@ class Benchmarker(object):
         self.create_diagram_repetition(repetitions)
         self.create_pie_chart(repetitions)
 
-
     def _get_benchmark(self, repetitions: int):
         if self.benchmark is None:
             self.benchmark = self.benchmark_models(repetitions)
-        
+
         return self.benchmark
 
     def f1_score(self, result_labels: list[str]) -> float:
@@ -125,11 +123,13 @@ class Benchmarker(object):
                 counter += 1
 
         return counter
-    
+
     def benchmark_models(self, repetitions: int):  # pragma: no cover
         return self.benchmark_models_with_index(repetitions, None)
 
-    def benchmark_models_with_index(self, repetitions: int, model_index: int):  # pragma: no cover
+    def benchmark_models_with_index(
+        self, repetitions: int, model_index: int
+    ):  # pragma: no cover
         """tests each model, saves the result to data/models/stats and returns a data-frame containing all test-results
 
         Args:
@@ -143,7 +143,6 @@ class Benchmarker(object):
             models = [self.models[model_index]]
         else:
             models = self.models
-
 
         data_frame = None
 
@@ -238,7 +237,6 @@ class Benchmarker(object):
                         true_negatives,
                         false_negatives,
                     ],
-
                 },
                 index=[
                     "True Positives",
@@ -358,13 +356,11 @@ class Benchmarker(object):
             models (list): list of all the models
         """
 
-
         for i in range(len(self.models)):
             f1_scores = []
             accuracy = []
             precision = []
             recall = []
-
 
             for _ in range(repetitions):
                 model_benchmark = self.benchmark_models_with_index(1, i)
@@ -372,7 +368,6 @@ class Benchmarker(object):
                 accuracy.append(model_benchmark["accuracy"].values[0])
                 precision.append(model_benchmark["precision"].values[0])
                 recall.append(model_benchmark["recall"].values[0])
-
 
             df = DataFrame(
                 {
@@ -393,4 +388,3 @@ class Benchmarker(object):
 
             makedir(f"img/{model_benchmark['model_name'].values[0]}")
             plt.savefig(f"img/{model_benchmark['model_name'].values[0]}/repetition.png")
-
