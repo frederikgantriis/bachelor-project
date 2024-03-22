@@ -8,7 +8,7 @@ from constants import OFF, NOT
 
 class BaselineRandom(MLAlgorithm):  # pragma: no cover
     def __init__(self, dataset: DatasetDict) -> None:
-        super().__init__(dataset)
+        super().__init__(dataset, "baseline-random")
 
     def train(self):
         pass
@@ -20,6 +20,3 @@ class BaselineRandom(MLAlgorithm):  # pragma: no cover
             answer.append(random.choice([OFF, NOT]))
 
         return answer
-
-    def __str__(self):
-        return "Baseline Random"

@@ -9,8 +9,8 @@ from constants import OFF, NOT
 
 
 class LogisticRegression(MLAlgorithm):
-    def __init__(self, dataset: DatasetDict) -> None:
-        super().__init__(dataset)
+    def __init__(self, dataset: DatasetDict, variation_name = None) -> None:
+        super().__init__(dataset, "logistic-regression", variation_name)
         self.hateful_words: set = set(
             pd.read_csv("./hurtlex_DA.tsv", sep="\t")["lemma"]
         )
@@ -93,8 +93,3 @@ class LogisticRegression(MLAlgorithm):
 
         return result
 
-    def __str__(self) -> str:
-        return "logistic-regression" + self.variation_name
-
-    def set_variation_name(self, name: str):
-        self.variation_name = "_" + name
