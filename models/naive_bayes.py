@@ -9,8 +9,10 @@ from spacy.tokens import Token, Doc
 
 
 class NaiveBayes(MLAlgorithm):  # pragma: no cover
-    def __init__(self, dataset: Dataset) -> None:  # pragma: no cover
-        super().__init__(dataset)  # type: ignore
+    def __init__(
+        self, dataset: Dataset, model_name="naive-bayes", variation_name=None
+    ) -> None:  # pragma: no cover
+        super().__init__(dataset, model_name, variation_name)  # type: ignore
         # base chance based on the split in classes in the dataset
         self.logprior = {}
         # Chance for each word to belong to each class
@@ -24,15 +26,7 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
         for comment in dataset.to_list():
             self.vocabulary.update(comment)
 
-        self.train_data = TrainData("naive-bayes")
-        self.variation_name = ""
-
-    def __str__(self) -> str:
-        return "naive-bayes" + self.variation_name
-
-    def set_variation_name(self, name: str):
-        self.variation_name = "_" + name
-        self.train_data = TrainData("naive-bayes" + self.variation_name)
+        self.train_data = TrainData(self.name)
 
     def train(self):  # pragma: no cover
         for c in self.classes:  # type: ignore
@@ -78,15 +72,14 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
         for comment in test_dataset_text:
             result.append(
                 self._find_class(
-                    comment,
-                    list(self.classes),
-                    self.logprior,
-                    self.loglikelihood
+                    comment, list(self.classes), self.logprior, self.loglikelihood
                 )
             )
         return result
 
-    def _find_class(self, comment: Doc, classes: list, logprior: dict, loglikelihood: dict):  # pragma: no cover
+    def _find_class(
+        self, comment: Doc, classes: list, logprior: dict, loglikelihood: dict
+    ):  # pragma: no cover
         sum = {}
         for c in classes:
             sum[c] = logprior[c]

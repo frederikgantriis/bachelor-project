@@ -127,7 +127,7 @@ class Benchmarker(object):
 
         return counter
 
-    def benchmark_models(self, repetitions: int, model_index: int):  # pragma: no cover
+    def benchmark_models(self, repetitions: int, model_index = None):  # pragma: no cover
         """Benchmarks all models initialized in the Benchmarker class
 
         Args:

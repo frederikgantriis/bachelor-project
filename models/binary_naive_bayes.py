@@ -1,16 +1,13 @@
-
 from data_parser import Dataset
 from models.naive_bayes import NaiveBayes
-from spacy.tokens import Token, Doc
-from data_storage import TrainData
+from spacy.tokens import Doc
 import math
 import utils
 
 
 class BinaryNaiveBayes(NaiveBayes):
-    def __init__(self, dataset: Dataset) -> None:
-        super().__init__(dataset)
-        self.train_data = TrainData("binary-naive-bayes")
+    def __init__(self, dataset: Dataset, variation_name=None) -> None:
+        super().__init__(dataset, "binary-naive-bayes", variation_name)
 
     def train(self):  # pragma: no cover
         for c in self.classes:  # type: ignore
@@ -20,8 +17,7 @@ class BinaryNaiveBayes(NaiveBayes):
             self.logprior[c] = math.log10(n_classes / self.n_instances)
 
             # Changed from base: Only counts words ones pr comment
-            words_in_class = utils.extract_unique_words_from_comments(
-                self.dataset[c])
+            words_in_class = utils.extract_unique_words_from_comments(self.dataset[c])
 
             n_words = self._count_words(words_in_class, self.vocabulary)
 
@@ -56,6 +52,3 @@ class BinaryNaiveBayes(NaiveBayes):
                     except KeyError:
                         continue
         return utils.get_max_value_key(sum)
-
-    def __str__(self) -> str:
-        return "binary-naive-bayes"
