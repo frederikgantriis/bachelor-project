@@ -138,7 +138,6 @@ class Datasets(object):
 
         try:
             self.dataset = self.storage.load_from_disk(disk_path)
-            print("Found tokenized dataset on disk!")
         except FileNotFoundError:
             print(
                 "No tokenized dataset on disk...\nTokenizing dataset using spacy and saving to disk...")
