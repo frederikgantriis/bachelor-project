@@ -15,6 +15,7 @@ class LogisticRegression(MLAlgorithm):
             pd.read_csv("./hurtlex_DA.tsv", sep="\t")["lemma"]
         )
         self.data_length = len(self.dataset[OFF]) + len(self.dataset[NOT])
+        self.variation_name = ""
 
     def sigmoid(self, x):
 
@@ -37,8 +38,7 @@ class LogisticRegression(MLAlgorithm):
             loss (float): A number giving value to how far the guess is from the right answer
             trainingspeed (float): Dictates how fast the weights change
         """
-        new_weights = [(loss * feature) * (-trainingspeed)
-                       for feature in features]
+        new_weights = [(loss * feature) * (-trainingspeed) for feature in features]
 
         result = [x + y for x, y in zip(self.weights, new_weights)]
 
@@ -94,4 +94,7 @@ class LogisticRegression(MLAlgorithm):
         return result
 
     def __str__(self) -> str:
-        return "logistic-regression"
+        return "logistic-regression" + self.variation_name
+
+    def set_variation_name(self, name: str):
+        self.variation_name = "_" + name
