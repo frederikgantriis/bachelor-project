@@ -42,7 +42,7 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
             self.logprior[c] = math.log10(n_classes / self.n_instances)
 
             words_in_class = utils.extract_words_from_comments(self.dataset[c])
-            n_words = count_words(words_in_class, self.vocabulary)
+            n_words = self._count_words(words_in_class, self.vocabulary)
 
             for word in self.vocabulary:
                 count = words_in_class[word] if word in words_in_class else 0
@@ -77,7 +77,7 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
 
         for comment in test_dataset_text:
             result.append(
-                find_class(
+                self._find_class(
                     comment,
                     list(self.classes),
                     self.logprior,
@@ -86,26 +86,22 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
             )
         return result
 
+    def _find_class(self, comment: Doc, classes: list, logprior: dict, loglikelihood: dict):  # pragma: no cover
+        sum = {}
+        for c in classes:
+            sum[c] = logprior[c]
+            for word in comment:
+                try:
+                    sum[c] += loglikelihood[(word.text, c)]
+                except KeyError:
+                    continue
+        return utils.get_max_value_key(sum)
 
-def find_class(
-    comment: Doc, classes: list, logprior: dict, loglikelihood: dict
-):  # pragma: no cover
-    sum = {}
-    for c in classes:
-        sum[c] = logprior[c]
-        for word in comment:
-            try:
-                sum[c] += loglikelihood[(word.text, c)]
-            except KeyError:
-                continue
-    return utils.get_max_value_key(sum)
-
-
-def count_words(words: dict, vocabulary: list):  # pragma: no cover
-    sum = 0
-    for word in vocabulary:
-        if word in words:
-            sum += words[word] + 1
-        else:
-            sum += 1
-    return sum
+    def _count_words(self, words: dict, vocabulary: list):  # pragma: no cover
+        sum = 0
+        for word in vocabulary:
+            if word in words:
+                sum += words[word] + 1
+            else:
+                sum += 1
+        return sum

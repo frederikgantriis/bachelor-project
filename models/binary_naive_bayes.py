@@ -1,6 +1,6 @@
 
 from data_parser import Dataset
-from models.naive_bayes import NaiveBayes, count_words
+from models.naive_bayes import NaiveBayes
 from spacy.tokens import Token, Doc
 from data_storage import TrainData
 import math
@@ -23,7 +23,7 @@ class BinaryNaiveBayes(NaiveBayes):
             words_in_class = utils.extract_unique_words_from_comments(
                 self.dataset[c])
 
-            n_words = count_words(words_in_class, self.vocabulary)
+            n_words = self._count_words(words_in_class, self.vocabulary)
 
             for word in self.vocabulary:
                 count = words_in_class[word] if word in words_in_class else 0
@@ -40,8 +40,8 @@ class BinaryNaiveBayes(NaiveBayes):
             # save the train data to disk
             self.train_data.save_to_disk()
 
-    def find_class(
-        comment: Doc, classes: list, logprior: dict, loglikelihood: dict
+    def _find_class(
+        self, comment: Doc, classes: list, logprior: dict, loglikelihood: dict
     ):  # pragma: no cover
         sum = {}
         for c in classes:
