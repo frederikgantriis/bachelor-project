@@ -1,6 +1,6 @@
 from data_parser import Dataset
 from data_storage import TrainData
-from models.naive_bayes import NaiveBayes, count_words
+from models.naive_bayes import NaiveBayes
 import math
 import utils
 
@@ -21,7 +21,7 @@ class AddKNaiveBayes(NaiveBayes):
             self.logprior[c] = math.log10(n_classes / self.n_instances)
 
             words_in_class = utils.extract_words_from_comments(self.dataset[c])
-            n_words = count_words(words_in_class, self.vocabulary)
+            n_words = self.count_words(words_in_class, self.vocabulary)
 
             for word in self.vocabulary:
                 count = words_in_class[word] if word in words_in_class else 0
