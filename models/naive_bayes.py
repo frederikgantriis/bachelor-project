@@ -59,7 +59,6 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
         for i in range(2):  # pragma: no cover
             try:
                 self.logprior, self.loglikelihood, _ = self.train_data.load_from_disk()
-                print("Found Naive Bayes training data!")
                 break
             except FileNotFoundError:
                 # exit the program if FileNotFoundError happens more than once
