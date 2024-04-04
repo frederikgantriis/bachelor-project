@@ -39,5 +39,8 @@ if __name__ == "__main__":
     baseline_random = BaselineRandom(train_datasets[0])
     to_be_benchmarked.append((baseline_random, test_datasets[0]))
 
+    baseline_majority = BaselineMajority(train_datasets[0])
+    to_be_benchmarked.append((baseline_majority, test_datasets[0]))
+
     benchmarker = Benchmarker(to_be_benchmarked)
     print(benchmarker.benchmark_models(20))
