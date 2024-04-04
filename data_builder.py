@@ -105,3 +105,35 @@ def get_test_datasets():
         Datasets(TEST).lowercase().remove_stop_words().remove_dots().lemmatize(),
         Datasets(TEST).remove_dots().remove_stop_words().lowercase().lemmatize()
     ]
+
+
+
+def get_logistic_regression_train():
+    return [
+        Datasets(TRAIN),
+        Datasets(TRAIN).remove_dots().lowercase(),
+        Datasets(TRAIN).lemmatize(),
+        Datasets(TRAIN).remove_dots().remove_stop_words(),
+        Datasets(TRAIN).remove_dots().lowercase().remove_stop_words(),
+        Datasets(TRAIN).remove_dots().lemmatize().remove_stop_words(),
+    ]
+
+def get_logistic_regression_test():
+    return [
+        Datasets(TEST),
+        Datasets(TEST).remove_dots().lowercase(),
+        Datasets(TEST).lemmatize(),
+        Datasets(TEST).remove_dots().remove_stop_words(),
+        Datasets(TEST).remove_dots().lowercase().remove_stop_words(),
+        Datasets(TEST).remove_dots().lemmatize().remove_stop_words(),
+    ]
+
+def get_logistic_regression_variations():
+    return [
+        "",
+        "remove_dots_lowercase",
+        "lemmatize",
+        "remove_dots_remove_stop_words",
+        "remove_dots_lowercase_remove_stop_words",
+        "remove_dots_lemmatize_remove_stop_words",
+    ]
