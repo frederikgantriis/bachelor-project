@@ -1,4 +1,5 @@
 import math
+import numpy
 import pandas as pd
 import decimal
 
@@ -20,17 +21,14 @@ class LogisticRegression(MLAlgorithm):
         self.weights = [0, 0]
 
     def sigmoid(self, x):
-
-        z = pow(decimal.Decimal(math.e), decimal.Decimal((-x)))
+        z = numpy.exp(-x)
         return float(1 / (1 + z))
 
     def is_hateful(self, word: str) -> bool:
         return word.lower() in self.hateful_words
 
     def crossentropy_loss(self, guess, expected):
-        return expected * (0 if guess == 0 else math.log(guess)) + (
-            1 - expected
-        ) * (0 if guess == 1 else math.log(1 - guess))
+        return -numpy.log(guess + 1e-10) if expected == 1 else -numpy.log(1 - guess + 1e-10)
 
     def gradient_descent(self, features, loss, trainingspeed):
         """Finds gradient vector and moves the opposite way
@@ -40,27 +38,28 @@ class LogisticRegression(MLAlgorithm):
             loss (float): A number giving value to how far the guess is from the right answer
             trainingspeed (float): Dictates how fast the weights change
         """
-        new_weights = [(loss * feature) * (trainingspeed) for feature in features]
+        new_weights = [(loss * feature) * (trainingspeed)
+                       for feature in features]
 
-        self.weights = [x - y for x, y in zip(self.weights, new_weights)]
-        self.bias_term -= loss * trainingspeed
+        self.weights = [x + y for x, y in zip(self.weights, new_weights)]
+        self.bias_term += loss * trainingspeed
 
     def train(self):
         """Resets weights and bias term, then train model on all comments in a random order"""
-
+        
         for i in permutation(self.data_length):
             if i < len(self.dataset[OFF]):
-                expected = 0
+                expected = 1
                 comment = self.dataset[OFF][i]
             else:
-                expected = 1
+                expected = 0
                 comment = self.dataset[NOT][i - len(self.dataset[OFF])]
 
             features = self.calculate_feature_amount(comment)
             vector_product = [x * y for x, y in zip(self.weights, features)]
             guess = self.sigmoid(sum(vector_product) + self.bias_term)
             self.gradient_descent(
-                features, self.crossentropy_loss(guess, expected), 0.1
+                features, self.crossentropy_loss(guess, expected), 0.1 if expected == 1 else -0.1
             )
 
     def calculate_feature_amount(self, comment):
