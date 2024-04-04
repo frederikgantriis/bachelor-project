@@ -11,7 +11,6 @@ from benchmarker import Benchmarker
 
 
 if __name__ == "__main__":
-
     train_datasets = get_train_datasets()
     test_datasets = get_test_datasets()
     variation_names = get_variations()
@@ -30,5 +29,8 @@ if __name__ == "__main__":
     baseline_random = BaselineRandom(train_datasets[0])
     to_be_benchmarked.append((baseline_random, test_datasets[0]))
 
+    baseline_majority = BaselineMajority(train_datasets[0])
+    to_be_benchmarked.append((baseline_majority, test_datasets[0]))
+
     benchmarker = Benchmarker(to_be_benchmarked)
-    print(benchmarker.benchmark_models(1, None))
+    print(benchmarker.benchmark_models(1))
