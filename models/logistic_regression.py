@@ -1,7 +1,5 @@
-import math
 import numpy
 import pandas as pd
-import decimal
 
 from numpy.random import permutation
 from datasets import DatasetDict
@@ -15,10 +13,20 @@ class LogisticRegression(MLAlgorithm):
         self.hateful_words: set = set(
             pd.read_csv("./hurtlex_DA.tsv", sep="\t")["lemma"]
         )
+        
         self.data_length = len(self.dataset[OFF]) + len(self.dataset[NOT])
         self.variation_name = ""
         self.bias_term = 0
-        self.weights = [0, 0]
+        self.weights = [0, 0, 0]
+
+        self.positive_words: set = set()
+        pos_words = open("data/sentiment-lexicons/positive_words_da.txt", "r")
+        while True:
+            word = pos_words.readline()
+            if not word:
+                break
+            self.positive_words.add(word[:-1])
+        pos_words.close()
 
     def sigmoid(self, x):
         z = numpy.exp(-x)
@@ -26,9 +34,12 @@ class LogisticRegression(MLAlgorithm):
 
     def is_hateful(self, word: str) -> bool:
         return word.lower() in self.hateful_words
+    
+    def is_positive(self, word: str) -> bool:
+        return word.lower() in self.positive_words
 
     def crossentropy_loss(self, guess, expected):
-        return -numpy.log(guess + 1e-10) if expected == 1 else -numpy.log(1 - guess + 1e-10)
+        return -numpy.log10(guess + 1e-10) if expected == 1 else -numpy.log10(1 - guess + 1e-10)
 
     def gradient_descent(self, features, loss, trainingspeed):
         """Finds gradient vector and moves the opposite way
@@ -76,7 +87,7 @@ class LogisticRegression(MLAlgorithm):
         for word in comment:
             if self.is_hateful(word.text):
                 features[0] += 1
-            else:
+            elif self.is_positive(word.text):
                 features[1] += 1
 
         return features
