@@ -6,6 +6,7 @@ from models.binary_naive_bayes import BinaryNaiveBayes
 from models.naive_bayes import NaiveBayes
 from models.add_k_naive_bayes import AddKNaiveBayes
 from models.logistic_regression import LogisticRegression
+from models.baseline_majority import BaselineMajority
 from benchmarker import Benchmarker
 
 
