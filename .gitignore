@@ -1,7 +1,8 @@
 env/
 .env
-data/
+data/*
 __pycache__
 storage_manager_data/
 .coverage
 img/
+!data/sentiment-lexicons/
