@@ -10,8 +10,11 @@ from spacy.tokens import Token, Doc
 
 class NaiveBayes(MLAlgorithm):  # pragma: no cover
     def __init__(
-        self, dataset: Dataset, model_name="naive-bayes", variation_name=None
+        self, dataset: Dataset, model_name="naive-bayes", variation_name=None, k_factor=1
     ) -> None:  # pragma: no cover
+        if k_factor != 1:
+            variation_name = f"add-k-{k_factor}_" + variation_name
+
         super().__init__(dataset, model_name, variation_name)  # type: ignore
         # base chance based on the split in classes in the dataset
         self.logprior = {}
@@ -27,6 +30,8 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
             self.vocabulary.update(comment)
 
         self.train_data = TrainData(self.name)
+
+        self.k_factor = k_factor        
 
     def train(self):  # pragma: no cover
         for c in self.classes:  # type: ignore
@@ -45,7 +50,7 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
                 # the amount of the word used in the class compared to the total amount of
                 # words used in the class.
                 self.loglikelihood[(word.text, c)] = math.log10(
-                    (count + 1) / (n_words - count + 1)
+                    (count + self.k_factor) / (n_words - count + self.k_factor)
                 )
 
             # update the train data parameters
