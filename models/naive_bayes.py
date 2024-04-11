@@ -10,7 +10,7 @@ from spacy.tokens import Token, Doc
 
 class NaiveBayes(MLAlgorithm):  # pragma: no cover
     def __init__(
-        self, dataset: Dataset, model_name="naive-bayes", variation_name=None, k_factor=1
+        self, dataset: Dataset, model_name="naive-bayes", variation_name=None, k_factor: float=1
     ) -> None:  # pragma: no cover
         if k_factor != 1:
             variation_name = f"add-k-{k_factor}_" + variation_name
