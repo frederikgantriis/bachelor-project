@@ -13,7 +13,7 @@ class LogisticRegression(MLAlgorithm):
         self.hateful_words: set = set(
             pd.read_csv("./hurtlex_DA.tsv", sep="\t")["lemma"]
         )
-        
+
         self.data_length = len(self.dataset[OFF]) + len(self.dataset[NOT])
         self.variation_name = ""
         self.bias_term = 0
@@ -34,7 +34,7 @@ class LogisticRegression(MLAlgorithm):
 
     def is_hateful(self, word: str) -> bool:
         return word.lower() in self.hateful_words
-    
+
     def is_positive(self, word: str) -> bool:
         return word.lower() in self.positive_words
 
@@ -57,7 +57,7 @@ class LogisticRegression(MLAlgorithm):
 
     def train(self):
         """Resets weights and bias term, then train model on all comments in a random order"""
-        
+
         for i in permutation(self.data_length):
             if i < len(self.dataset[OFF]):
                 expected = 1
@@ -66,14 +66,15 @@ class LogisticRegression(MLAlgorithm):
                 expected = 0
                 comment = self.dataset[NOT][i - len(self.dataset[OFF])]
 
-            features = self.calculate_feature_amount(comment)
+            features = self.calculate_features(comment)
             vector_product = [x * y for x, y in zip(self.weights, features)]
             guess = self.sigmoid(sum(vector_product) + self.bias_term)
             self.gradient_descent(
-                features, self.crossentropy_loss(guess, expected), 0.1 if expected == 1 else -0.1
+                features, self.crossentropy_loss(
+                    guess, expected), 0.1 if expected == 1 else -0.1
             )
 
-    def calculate_feature_amount(self, comment):
+    def calculate_features(self, comment):
         """Assigns value to each feature based on comment then asignes their weight. Then normalises the output.
 
         Args:
@@ -97,7 +98,7 @@ class LogisticRegression(MLAlgorithm):
         self.train()
 
         for test in test_dataset_text:
-            features = self.calculate_feature_amount(test)
+            features = self.calculate_features(test)
             vector_product = [x * y for x, y in zip(self.weights, features)]
             guess = self.sigmoid(sum(vector_product) + self.bias_term)
 
