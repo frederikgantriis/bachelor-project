@@ -6,10 +6,10 @@ def extract_words_from_comments(comments):
 
     for comment in comments:
         for word in comment:
-            if word not in extracted_words:
-                extracted_words[word] = 1
+            if word.text not in extracted_words.keys():
+                extracted_words[word.text] = 1
             else:
-                extracted_words[word] += 1
+                extracted_words[word.text] += 1
 
     return extracted_words
 

@@ -10,7 +10,7 @@ from spacy.tokens import Token, Doc
 
 class NaiveBayes(MLAlgorithm):  # pragma: no cover
     def __init__(
-        self, dataset: Dataset, model_name="naive-bayes", variation_name=None, k_factor=1
+        self, dataset: Dataset, model_name="naive-bayes", variation_name=None, k_factor: float=1
     ) -> None:  # pragma: no cover
         if k_factor != 1:
             variation_name = f"add-k-{k_factor}_" + variation_name
@@ -36,7 +36,7 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
     def train(self):  # pragma: no cover
         for c in self.classes:  # type: ignore
             # amount of instances with this class
-            n_classes = len(self.dataset)
+            n_classes = len(self.dataset[c])
             # it gives a base chance for it being NOT or OFF based on the split in the dataset
             self.logprior[c] = math.log10(n_classes / self.n_instances)
 
@@ -44,7 +44,7 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
             n_words = self._count_words(words_in_class, self.vocabulary)
 
             for word in self.vocabulary:
-                count = words_in_class[word] if word in words_in_class else 0
+                count = words_in_class[word.text] if word.text in words_in_class else 0
 
                 # compute the likelihood of this word being generated from this class based on
                 # the amount of the word used in the class compared to the total amount of
@@ -97,8 +97,8 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
     def _count_words(self, words: dict, vocabulary: list):  # pragma: no cover
         sum = 0
         for word in vocabulary:
-            if word in words:
-                sum += words[word] + 1
+            if word.text in words.keys():
+                sum += words[word.text] + 1
             else:
                 sum += 1
         return sum
