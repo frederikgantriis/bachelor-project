@@ -73,3 +73,4 @@ wasabi==1.1.2
 weasel==0.3.4
 xxhash==3.4.1
 yarl==1.9.4
+sklearn-features==0.0.2
