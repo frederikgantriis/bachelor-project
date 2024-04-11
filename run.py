@@ -37,7 +37,7 @@ def add_naive_bayes_models_with_k_factors(to_be_benchmarked, train_datasets, tes
             test_datasets[i],
         )
         for i in range(len(train_datasets))
-        for j in np.arange(0, 1, 0.1)
+        for j in np.arange(0, 0.9, 0.1)
     ]
     return to_be_benchmarked
 
