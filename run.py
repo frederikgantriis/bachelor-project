@@ -1,53 +1,58 @@
 import numpy as np
-from constants import TEST, TRAIN
 from data_builder import *
-from data_parser import Datasets
 from models.baseline_random import BaselineRandom
 from models.naive_bayes import NaiveBayes
 from models.logistic_regression import LogisticRegression
 from models.baseline_majority import BaselineMajority
 from benchmarker import Benchmarker
 
-def add_baseline_models(to_be_benchmarked, train_datasets, test_datasets, variation_names):
+
+def add_baseline_models(train_datasets, test_datasets, variation_names):
     # Add BaselineRandom and BaselineMajority models to the list, both trained on the first training dataset
-    to_be_benchmarked += [
+    return [
         (BaselineRandom(train_datasets[0]), test_datasets[0]),
         (BaselineMajority(train_datasets[0]), test_datasets[0]),
     ]
-    return to_be_benchmarked
 
-def add_standard_naive_bayes_models(to_be_benchmarked, train_datasets, test_datasets, variation_names):
+
+def add_standard_naive_bayes_models(train_datasets, test_datasets, variation_names):
     # For each training dataset, create a NaiveBayes model and pair it with the corresponding test dataset
-    to_be_benchmarked += [
+    return [
         (
             NaiveBayes(train_datasets[i], variation_name=variation_names[i]),
             test_datasets[i],
         )
         for i in range(len(train_datasets))
     ]
-    return to_be_benchmarked
 
-def add_naive_bayes_models_with_k_factors(to_be_benchmarked, train_datasets, test_datasets, variation_names):
+
+def add_naive_bayes_models_with_k_factors(
+    train_datasets, test_datasets, variation_names
+):
     # Add more NaiveBayes models to the list, this time with varying k_factor values
-    to_be_benchmarked += [
+
+    return [
         (
             NaiveBayes(
-                train_datasets[i], variation_name=variation_names[i], k_factor=j
+                train_datasets[i], variation_name=variation_names[i], k_factor=k_factor
             ),
             test_datasets[i],
         )
         for i in range(len(train_datasets))
-        for j in np.arange(0.1, 0.9, 0.1)
+        for k_factor in np.arange(0.1, 1, 0.1)
     ]
-    return to_be_benchmarked
 
-def add_logistic_regression_models(to_be_benchmarked, train_datasets, test_datasets, variation_names):
+
+def add_logistic_regression_models(train_datasets, test_datasets, variation_names):
     # Add LogisticRegression models to the list
-    to_be_benchmarked += [
-        (LogisticRegression(train_datasets[i], variation_name=variation_names[i]), test_datasets[i])
+    return [
+        (
+            LogisticRegression(train_datasets[i], variation_name=variation_names[i]),
+            test_datasets[i],
+        )
         for i in range(len(train_datasets))
     ]
-    return to_be_benchmarked
+
 
 if __name__ == "__main__":
 
@@ -64,16 +69,22 @@ if __name__ == "__main__":
 
     # Initialize a list to hold all models to be benchmarked
     # For each training dataset, create a NaiveBayes model and pair it with the corresponding test dataset
-    to_be_benchmarked = add_standard_naive_bayes_models([], train_datasets, test_datasets, variation_names)
+    to_be_benchmarked = add_standard_naive_bayes_models(
+        train_datasets, test_datasets, variation_names
+    )
 
     # Add more NaiveBayes models to the list, this time with varying k_factor values
-    to_be_benchmarked += add_naive_bayes_models_with_k_factors(to_be_benchmarked, train_datasets, test_datasets, variation_names)
+    to_be_benchmarked += add_naive_bayes_models_with_k_factors(
+        train_datasets, test_datasets, variation_names
+    )
 
     # Add LogisticRegression models to the list
     # to_be_benchmarked += add_logistic_regression_models(to_be_benchmarked, train_datasets, test_datasets, variation_names)
 
     # Add BaselineRandom and BaselineMajority models to the list, both trained on the first training dataset
-    to_be_benchmarked += add_baseline_models(to_be_benchmarked, train_datasets, test_datasets, variation_names)
+    to_be_benchmarked += add_baseline_models(
+        train_datasets, test_datasets, variation_names
+    )
 
     # Create a Benchmarker object with the list of models to be benchmarked
     benchmarker = Benchmarker(to_be_benchmarked, 10)
