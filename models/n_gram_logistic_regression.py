@@ -13,15 +13,19 @@ class NGramLogisticRegression(LogisticRegression):
     def __init__(self, dataset: Dataset, model_name=None, variation_name=None) -> None:
         super().__init__(dataset, "n_grams_"+ variation_name)
         vocabolary = []
+        
+        self.nCharMin, self.nCharMax = 1,4
+        self.nWordMin, self.nWordMax = 1,1
+
 
         for comment in dataset.to_list():
             vocabolary.append(comment.text)
 
-        vectorizer = CountVectorizer(analyzer='char', ngram_range=(2, 4))
+        vectorizer = CountVectorizer(analyzer='char', ngram_range=(self.nCharMin, self.nCharMax))
         vectorizer.fit_transform(vocabolary)
         self.weights = dict().fromkeys(vectorizer.get_feature_names_out(), 0)
 
-        vectorizer = CountVectorizer(analyzer='word', ngram_range=(0, 0))
+        vectorizer = CountVectorizer(analyzer='word', ngram_range=(self.nWordMin, self.nWordMax))
         vectorizer.fit_transform(vocabolary)
         x = dict().fromkeys(vectorizer.get_feature_names_out(), 0)
         self.weights.update(x)
@@ -64,14 +68,14 @@ class NGramLogisticRegression(LogisticRegression):
     def calculate_features(self, comment):
         features = []
         try:
-            vectorizer = CountVectorizer(analyzer='char', ngram_range=(2, 4))
+            vectorizer = CountVectorizer(analyzer='char', ngram_range=(self.nCharMin, self.nCharMax))
             vectorizer.fit_transform([comment.text])
 
             for feat in vectorizer.get_feature_names_out():
                 if feat in self.weights:
                     features.append(feat)
 
-            vectorizer = CountVectorizer(analyzer='word', ngram_range=(0, 0))
+            vectorizer = CountVectorizer(analyzer='word', ngram_range=(self.nWordMin, self.nWordMax))
             vectorizer.fit_transform([comment.text])
 
             for feat in vectorizer.get_feature_names_out():
