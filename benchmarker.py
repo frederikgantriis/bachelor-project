@@ -57,6 +57,7 @@ class Benchmarker:
 
         for model in models:
             stats_average = {metric: 0 for metric in self.metrics}
+            print(f"Running benchmark for {model[0]}")
 
             for _ in range(repetitions):
                 result_labels = model[0].test(model[1].to_list())
@@ -81,6 +82,7 @@ class Benchmarker:
             self.create_bar_chart(metric)
 
         self.create_diagram_repetition()
+        self.create_confusion_matrix()
 
     def create_bar_chart(self, metric: str):
         metrics = []
@@ -97,6 +99,7 @@ class Benchmarker:
 
         makedir("img")
         plt.savefig(f"img/{metric}.png")
+        plt.close()
 
     def create_diagram_repetition(self):
         """Create a diagram of the average f1 score for each model
@@ -126,3 +129,43 @@ class Benchmarker:
 
             makedir(f"img/{model_benchmark['model_name'].values[0]}")
             plt.savefig(f"img/{model_benchmark['model_name'].values[0]}/repetition.png")
+            plt.close()
+
+    def create_confusion_matrix(self):
+        for i in range(len(self.models)):
+            model_benchmark = self._get_benchmark()
+            result_labels = self.models[i][0].test(self.models[i][1].to_list())
+            self.create_confusion_matrix_for_model(result_labels, model_benchmark["model_name"].values[i])
+
+    def create_confusion_matrix_for_model(self, result_labels: list[str], model_name: str):
+        tp = self.count_labels(OFF, OFF, result_labels)
+        tn = self.count_labels(NOT, NOT, result_labels)
+        fp = self.count_labels(OFF, NOT, result_labels)
+        fn = self.count_labels(NOT, OFF, result_labels)
+
+        df = DataFrame(
+            {
+                "Predicted Offensive": [tp, fp],
+                "Predicted Not Offensive": [fn, tn],
+            },
+            index=["Actual Offensive", "Actual Not Offensive"],
+        )
+
+        # plot the confusion matrix in a matrix form
+        plt.figure(figsize=(10, 7))
+        plt.title(f"{model_name} Confusion Matrix")
+        plt.imshow(df, cmap="Blues", interpolation="nearest")
+        plt.colorbar()
+
+        for i in range(2):
+            for j in range(2):
+                plt.text(j, i, df.values[i, j], ha="center", va="center", color="black")
+
+        plt.xticks(range(2), df.columns)
+        plt.yticks(range(2), df.index)
+        plt.xlabel("Predicted")
+        plt.ylabel("Actual")
+
+        makedir(f"img/{model_name}")
+        plt.savefig(f"img/{model_name}/confusion_matrix.png")
+        plt.close()
