@@ -57,11 +57,16 @@ def add_logistic_regression_models(train_datasets, test_datasets, variation_name
 if __name__ == "__main__":
 
     # Get the names of all variations
-    variation_names = get_variations()
+    # variation_names = get_variations()
     # Get all training datasets
-    train_datasets = get_train_datasets()
+    # train_datasets = get_train_datasets()
     # Get all testing datasets
-    test_datasets = get_test_datasets()
+    # test_datasets = get_test_datasets()
+
+    train_datasets = get_best_naive_bayes_train()
+    test_datasets = get_best_naive_bayes_test()
+    variation_names = get_best_naive_bayes_variations()
+
 
     # train_datasets = [Datasets(TRAIN)]
     # test_datasets = [Datasets(TEST)]
@@ -74,22 +79,22 @@ if __name__ == "__main__":
     )
 
     # Add more NaiveBayes models to the list, this time with varying k_factor values
-    to_be_benchmarked += add_naive_bayes_models_with_k_factors(
-        train_datasets, test_datasets, variation_names
-    )
+    # to_be_benchmarked += add_naive_bayes_models_with_k_factors(
+        # train_datasets, test_datasets, variation_names
+    # )
 
     # Add LogisticRegression models to the list
     # to_be_benchmarked += add_logistic_regression_models(to_be_benchmarked, train_datasets, test_datasets, variation_names)
 
     # Add BaselineRandom and BaselineMajority models to the list, both trained on the first training dataset
-    to_be_benchmarked += add_baseline_models(
-        train_datasets, test_datasets, variation_names
-    )
+    # to_be_benchmarked += add_baseline_models(
+        # train_datasets, test_datasets, variation_names
+    # )
 
     # Create a Benchmarker object with the list of models to be benchmarked
     benchmarker = Benchmarker(to_be_benchmarked, 10)
 
     # Print the results of benchmarking the models
-    benchmarker.benchmark_models()
+    benchmarker.get_wrongly_classified()
 
     # benchmarker.create_all_charts()
