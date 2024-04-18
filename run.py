@@ -47,8 +47,7 @@ def add_logistic_regression_models(train_datasets, test_datasets, variation_name
     # Add LogisticRegression models to the list
     return [
         (
-            LogisticRegression(
-                train_datasets[i], variation_name=variation_names[i]),
+            LogisticRegression(train_datasets[i], variation_name=variation_names[i]),
             test_datasets[i],
         )
         for i in range(len(train_datasets))
