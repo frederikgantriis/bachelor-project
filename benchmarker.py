@@ -189,20 +189,24 @@ class Benchmarker:
 
     def get_common_wrongly_classified(self):
         wrongly_classified = {}
+        basic_train_dataset = Datasets(TRAIN).to_dict()
+        words_set = set(word.text for data in basic_train_dataset[OFF] + basic_train_dataset[NOT] for word in data)
 
         for model, dataset in self.models:
             result_labels = model.test(dataset.to_list())
 
             for result_label, dataset_label, comment in zip(result_labels, self.dataset_labels, self.test_dataset.to_list()):
                 if result_label != dataset_label:
+                    comment_words = [word.text for word in comment]
+                    common_words = [word for word in comment_words if word not in words_set]
                     if comment not in wrongly_classified:
-                        wrongly_classified[comment] = [dataset_label, result_label, 1, [model.name]]
+                        wrongly_classified[comment] = [dataset_label, result_label, 1, common_words, [model.name]]
                     else:
                         wrongly_classified[comment][2] += 1
-                        wrongly_classified[comment][3].append(model.name)
+                        wrongly_classified[comment][4].append(model.name)
 
-        wrongly_classified_list = [[k, v[0], v[1], v[2], v[3]] for k, v in wrongly_classified.items() if v[2] > 1]
-        df = DataFrame(wrongly_classified_list, columns=["Comment", "Actual", "Predicted", "Amount of models", "Model names"])
+        wrongly_classified_list = [[k, *v] for k, v in wrongly_classified.items() if v[2] > 1]
+        df = DataFrame(wrongly_classified_list, columns=["Comment", "Actual", "Predicted", "Amount of models", "Words not in train dataset", "Models"])
         df.to_csv("data/models/stats/wrongly-classified/common-wrongly-classified.csv")
 
     def get_wrongly_classified_for_model(self, result_labels: list[str], model_name: str):
