@@ -57,9 +57,12 @@ class Benchmarker:
 
         for model in models:
             stats_average = {metric: 0 for metric in self.metrics}
-            print(f"Running benchmark for {model[0]}")
+            # print "Running benchmark for model_name" but only update model_name
+            print(f"Running benchmark for {model[0].name}", end="\r")
 
             for _ in range(repetitions):
+                print(f"Repetition: {_ + 1}/{repetitions}", end="\r")
+
                 result_labels = model[0].test(model[1].to_list())
                 for metric in stats_average.keys():
                     stats_average[metric] += self.calculate_metric(result_labels, metric)
