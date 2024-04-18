@@ -13,7 +13,7 @@ class NGramLogisticRegression(LogisticRegression):
         super().__init__(dataset, "n_grams_"+ variation_name)
         vocabolary = []
         
-        self.nCharMin, self.nCharMax = 1,4
+        self.nCharMin, self.nCharMax = 2,4
         self.nWordMin, self.nWordMax = 1,1
 
 
