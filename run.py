@@ -1,47 +1,95 @@
-from constants import TEST, TRAIN
+import numpy as np
 from data_builder import *
-from data_parser import Datasets
 from models.baseline_random import BaselineRandom
-from models.binary_naive_bayes import BinaryNaiveBayes
 from models.naive_bayes import NaiveBayes
-from models.add_k_naive_bayes import AddKNaiveBayes
 from models.logistic_regression import LogisticRegression
 from models.baseline_majority import BaselineMajority
 from benchmarker import Benchmarker
 
 
+def add_baseline_models(train_datasets, test_datasets, variation_names):
+    # Add BaselineRandom and BaselineMajority models to the list, both trained on the first training dataset
+    return [
+        (BaselineRandom(train_datasets[0]), test_datasets[0]),
+        (BaselineMajority(train_datasets[0]), test_datasets[0]),
+    ]
+
+
+def add_standard_naive_bayes_models(train_datasets, test_datasets, variation_names):
+    # For each training dataset, create a NaiveBayes model and pair it with the corresponding test dataset
+    return [
+        (
+            NaiveBayes(train_datasets[i], variation_name=variation_names[i]),
+            test_datasets[i],
+        )
+        for i in range(len(train_datasets))
+    ]
+
+
+def add_naive_bayes_models_with_k_factors(
+    train_datasets, test_datasets, variation_names
+):
+    # Add more NaiveBayes models to the list, this time with varying k_factor values
+
+    return [
+        (
+            NaiveBayes(
+                train_datasets[i], variation_name=variation_names[i], k_factor=k_factor
+            ),
+            test_datasets[i],
+        )
+        for i in range(len(train_datasets))
+        for k_factor in np.arange(0.1, 1, 0.1)
+    ]
+
+
+def add_logistic_regression_models(train_datasets, test_datasets, variation_names):
+    # Add LogisticRegression models to the list
+    return [
+        (
+            LogisticRegression(train_datasets[i], variation_name=variation_names[i]),
+            test_datasets[i],
+        )
+        for i in range(len(train_datasets))
+    ]
+
+
 if __name__ == "__main__":
 
-    # train_datasets = get_train_datasets()
-    # test_datasets = get_test_datasets()
+    # Get the names of all variations
+    variation_names = get_variations()
+    # Get all training datasets
+    train_datasets = get_train_datasets()
+    # Get all testing datasets
+    test_datasets = get_test_datasets()
 
     # train_datasets = [Datasets(TRAIN)]
     # test_datasets = [Datasets(TEST)]
+    # variation_names = [""]
 
-    train_datasets = get_logistic_regression_train()
-    test_datasets = get_logistic_regression_test()
+    # Initialize a list to hold all models to be benchmarked
+    # For each training dataset, create a NaiveBayes model and pair it with the corresponding test dataset
+    to_be_benchmarked = add_standard_naive_bayes_models(
+        train_datasets, test_datasets, variation_names
+    )
 
-    variation_names = get_logistic_regression_variations()
-    to_be_benchmarked = []
+    # Add more NaiveBayes models to the list, this time with varying k_factor values
+    to_be_benchmarked += add_naive_bayes_models_with_k_factors(
+        train_datasets, test_datasets, variation_names
+    )
 
-    for i in range(len(train_datasets)):
-        # nb = NaiveBayes(train_datasets[i], variation_name=variation_names[i])
-        # to_be_benchmarked.append((nb, test_datasets[i]))
+    # Add LogisticRegression models to the list
+    # to_be_benchmarked += add_logistic_regression_models(to_be_benchmarked, train_datasets, test_datasets, variation_names)
 
-        # bnb = BinaryNaiveBayes(train_datasets[i], variation_name=variation_names[i])
-        # to_be_benchmarked.append((bnb, test_datasets[i]))
+    # Add BaselineRandom and BaselineMajority models to the list, both trained on the first training dataset
+    to_be_benchmarked += add_baseline_models(
+        train_datasets, test_datasets, variation_names
+    )
 
-        # aknb = AddKNaiveBayes(train_datasets[i], variation_name=variation_names[i])
-        # to_be_benchmarked.append((aknb, test_datasets[i]))
+    # Create a Benchmarker object with the list of models to be benchmarked
+    benchmarker = Benchmarker(to_be_benchmarked, 10)
 
-        lr = LogisticRegression(train_datasets[i], variation_name=variation_names[i])
-        to_be_benchmarked.append((lr, test_datasets[i]))
+    # Print the results of benchmarking the models
+    benchmarker.benchmark_models()
 
-    baseline_random = BaselineRandom(train_datasets[0])
-    to_be_benchmarked.append((baseline_random, test_datasets[0]))
-
-    baseline_majority = BaselineMajority(train_datasets[0])
-    to_be_benchmarked.append((baseline_majority, test_datasets[0]))
-
-    benchmarker = Benchmarker(to_be_benchmarked)
-    print(benchmarker.benchmark_models(20))
+    # benchmarker.create_all_charts()

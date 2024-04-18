@@ -100,6 +100,17 @@ class Datasets(object):
         self.dataset = self._sanitize_dataset(self.dataset, method)
         self._save_to_disk()
         return self
+    
+    def extract_unique_words(self):
+        """extracts unique words from the dataset"""
+        self.dataset_type = self.dataset_type + "_extract_unique_words"
+        if self._try_load_from_disk():
+            return self
+        
+        method: Callable[[list[Token]], list[Token]] = lambda lst: list(set(lst))
+        self.dataset = self._sanitize_dataset(self.dataset, method)
+        self._save_to_disk()
+        return self
 
     def _convert_dataset(self, nlp: Language, dataset: Dataset):
         """converts a hugginface dataset into the dataset type accepted by our models
@@ -161,3 +172,6 @@ class Datasets(object):
     def _save_to_disk(self):
         disk_path = self.folder_path + self.dataset_type + ".pkl"
         self.storage.save_to_disk(self.dataset, self.folder_path, disk_path)
+
+    def get_all_attributes(self):
+        return ["remove_dots", "remove_stop_words", "lowercase", "lemmatize", "extract_unique_words"]
