@@ -1,4 +1,3 @@
-from re import A
 import numpy as np
 from data_builder import *
 from models.baseline_random import BaselineRandom
