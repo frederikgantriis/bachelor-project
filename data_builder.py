@@ -88,3 +88,15 @@ def get_best_naive_bayes_test():
         Datasets(TEST).remove_stop_words().remove_dots().lowercase().lemmatize(),
         Datasets(TEST).remove_stop_words().remove_dots().extract_unique_words().lowercase().lemmatize()
     ]
+
+def get_best_naive_bayes_variations():
+    return [
+        "lowercase_remove_dots_lemmatize_remove_stop_words_extract_unique_words",
+        "remove_dots_lowercase_extract_unique_words_lemmatize_remove_stop_words",
+        "remove_dots_remove_stop_words_lowercase_lemmatize_extract_unique_words",
+        "remove_stop_words_lowercase_remove_dots_lemmatize_extract_unique_words",
+        "remove_dots_remove_stop_words_lowercase_lemmatize",
+        "remove_dots_lowercase_remove_stop_words_lemmatize",
+        "remove_stop_words_remove_dots_lowercase_lemmatize",
+        "remove_stop_words_remove_dots_extract_unique_words_lowercase_lemmatize"
+    ]
