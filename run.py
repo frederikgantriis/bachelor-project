@@ -1,10 +1,13 @@
+from re import A
 import numpy as np
 from data_builder import *
 from models.baseline_random import BaselineRandom
+from models.n_gram_logistic_regression import NGramLogisticRegression
 from models.naive_bayes import NaiveBayes
 from models.logistic_regression import LogisticRegression
 from models.baseline_majority import BaselineMajority
 from benchmarker import Benchmarker
+from models.svm import SVM
 
 
 def add_baseline_models(train_datasets, test_datasets, variation_names):
@@ -54,47 +57,72 @@ def add_logistic_regression_models(train_datasets, test_datasets, variation_name
     ]
 
 
+def add_ngram_logistic_regression_models(
+    train_datasets, test_datasets, variation_names
+):
+    # Add LogisticRegression models to the list
+    return [
+        (
+            NGramLogisticRegression(
+                train_datasets[i], variation_name=variation_names[i]
+            ),
+            test_datasets[i],
+        )
+        for i in range(len(train_datasets))
+    ]
+
+
+def add_svm_models(train_datasets, test_datasets, variation_names):
+    return [
+        (
+            SVM(train_datasets[i], variation_name=variation_names[i]),
+            test_datasets[i],
+        )
+        for i in range(len(train_datasets))
+    ]
+
+
 if __name__ == "__main__":
 
     # Get the names of all variations
-    # variation_names = get_variations()
+    variation_names = get_variations()
     # Get all training datasets
-    # train_datasets = get_train_datasets()
+    train_datasets = get_train_datasets()
     # Get all testing datasets
-    # test_datasets = get_test_datasets()
+    test_datasets = get_test_datasets()
 
-    train_datasets = get_best_naive_bayes_train()
-    test_datasets = get_best_naive_bayes_test()
-    variation_names = get_best_naive_bayes_variations()
-
-
-    # train_datasets = [Datasets(TRAIN)]
-    # test_datasets = [Datasets(TEST)]
-    # variation_names = [""]
-
-    # Initialize a list to hold all models to be benchmarked
     # For each training dataset, create a NaiveBayes model and pair it with the corresponding test dataset
     to_be_benchmarked = add_standard_naive_bayes_models(
         train_datasets, test_datasets, variation_names
     )
 
     # Add more NaiveBayes models to the list, this time with varying k_factor values
-    # to_be_benchmarked += add_naive_bayes_models_with_k_factors(
-        # train_datasets, test_datasets, variation_names
-    # )
+    to_be_benchmarked += add_naive_bayes_models_with_k_factors(
+        train_datasets, test_datasets, variation_names
+    )
 
     # Add LogisticRegression models to the list
-    # to_be_benchmarked += add_logistic_regression_models(to_be_benchmarked, train_datasets, test_datasets, variation_names)
+    to_be_benchmarked += add_logistic_regression_models(
+        to_be_benchmarked, train_datasets, test_datasets, variation_names
+    )
 
     # Add BaselineRandom and BaselineMajority models to the list, both trained on the first training dataset
-    # to_be_benchmarked += add_baseline_models(
-        # train_datasets, test_datasets, variation_names
-    # )
+    to_be_benchmarked += add_baseline_models(
+        train_datasets, test_datasets, variation_names
+    )
+
+    # Add ngram logistic regression models to the list
+    to_be_benchmarked += add_ngram_logistic_regression_models(
+        to_be_benchmarked, train_datasets, test_datasets, variation_names
+    )
+
+    # Add SVM models to the list
+    to_be_benchmarked += add_svm_models(
+        to_be_benchmarked, train_datasets, test_datasets, variation_names
+    )
 
     # Create a Benchmarker object with the list of models to be benchmarked
     benchmarker = Benchmarker(to_be_benchmarked, 10)
 
     # Print the results of benchmarking the models
-    benchmarker.get_wrongly_classified()
-
-    # benchmarker.create_all_charts()
+    benchmarker.benchmark_models()
