@@ -76,7 +76,6 @@ class Benchmarker:
             data_frame = concat([data_frame, model_data.as_data_frame()], ignore_index=True) if data_frame is not None else model_data.as_data_frame()
 
             model_data.save_to_disk()
-            clear()
 
         makedir("data/models/stats/latest_benchmark")
         data_frame.to_csv(f"data/models/stats/latest_benchmark/{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv")
