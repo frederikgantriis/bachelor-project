@@ -1,17 +1,13 @@
-import array
-import numpy
+from random import shuffle
 import pandas as pd
 
 from numpy.random import permutation
 from datasets import DatasetDict
 from sklearn.pipeline import FeatureUnion, make_pipeline
+from sklearn.svm import SVC
 from models.ml_algorithm import MLAlgorithm
-from constants import OFF, NOT
 import pandas as pd
-from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.svm import SVC, LinearSVC
-from sklearn.metrics import classification_report, accuracy_score
 
 
 class SVM(MLAlgorithm):
@@ -21,9 +17,12 @@ class SVM(MLAlgorithm):
         self.data = {}
         off = [(x, "OFF") for x in self.dataset["OFF"]]
         not_off = [(x, "NOT") for x in self.dataset["NOT"]]
+        self.list = off + not_off
 
-        self.X = [x[0].text for x in off + not_off]
-        self.y = [x[1] for x in off + not_off]
+        shuffle(self.list)
+
+        self.X = [x[0].text for x in self.list]
+        self.y = [x[1] for x in self.list]
 
         self.df = pd.DataFrame(self.data)
 
