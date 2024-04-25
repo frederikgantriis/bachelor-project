@@ -1,17 +1,11 @@
-import array
-import numpy
 import pandas as pd
 
-from numpy.random import permutation
 from datasets import DatasetDict
 from sklearn.pipeline import FeatureUnion, make_pipeline
 from models.ml_algorithm import MLAlgorithm
-from constants import OFF, NOT
 import pandas as pd
-from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.svm import SVC, LinearSVC
-from sklearn.metrics import classification_report, accuracy_score
+from sklearn.svm import SVC
 
 
 class SVM(MLAlgorithm):
@@ -32,12 +26,14 @@ class SVM(MLAlgorithm):
             ('word_tfidf', TfidfVectorizer(analyzer='word', ngram_range=(1, 2))),
             ('char_tfidf', TfidfVectorizer(analyzer='char', ngram_range=(2, 4)))
         ]), SVC(kernel='linear', C=10))
+        self.is_trained = False
 
     def train(self):
         self.svm_model.fit(self.X, self.y)
+        self.is_trained = True
 
     def test(self, test_dataset_text):
-        if self.svm_model is None:
+        if not self.is_trained:
             self.train()
 
         results = []

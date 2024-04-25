@@ -1,11 +1,13 @@
 from datetime import date
 import datetime
+import fcntl
 from pandas import DataFrame, concat
 from data_storage import StatsData
 from data_parser import Datasets
 from constants import *
 from models.ml_algorithm import MLAlgorithm
 from utils import clear, makedir
+import threading
 import matplotlib.pyplot as plt
 
 
@@ -17,6 +19,7 @@ class Benchmarker:
         self.benchmark = None
         self.repetitions = repetitions
         self.metrics = [F1, PRECISION, RECALL, ACCURACY, TRUE_POSITIVES, FALSE_POSITIVES, TRUE_NEGATIVES, FALSE_NEGATIVES]
+        self.data_frame = None
 
     def _get_benchmark(self):
         if self.benchmark is None:
@@ -55,12 +58,32 @@ class Benchmarker:
         if self.benchmark is not None:
             return self.benchmark
         models = [self.models[model_index]] if model_index is not None else self.models
-        data_frame = None
 
-        for model in models:
-            stats_average = {metric: 0 for metric in self.metrics}
-            # print "Running benchmark for model_name" but only update model_name
+        data_frame = DataFrame()
+        makedir("data/models/stats/latest_benchmark")
+
+        filename = f"data/models/stats/latest_benchmark/{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+
+        data_frame = DataFrame({
+            "model_name": [],
+            "f1": [],
+            "accuracy": [],
+            "precision": [],
+            "recall": [],
+            "true_positives": [],
+            "false_positives": [],
+            "true_negatives": [],
+            "false_negatives": [],
+            "timestamp": []
+        }) 
+
+        data_frame.to_csv(filename)  # Save the initial empty dataframe with headers
+
+        def run_model(model, repetitions, filename):
             print(f"Running benchmark for {model[0].name}", end="\r")
+            stats_average = {metric: 0 for metric in self.metrics}
+
+            data_frame2 = None
 
             for _ in range(repetitions):
                 print(f"Repetition: {_ + 1}/{repetitions}", end="\r")
@@ -73,13 +96,33 @@ class Benchmarker:
 
             model_data = StatsData(str(model[0]), **stats_average)
 
-            data_frame = concat([data_frame, model_data.as_data_frame()], ignore_index=True) if data_frame is not None else model_data.as_data_frame()
+            data_frame2 = concat([data_frame, model_data.as_data_frame()], ignore_index=True) if data_frame is not None else model_data.as_data_frame()
 
             model_data.save_to_disk()
 
-        makedir("data/models/stats/latest_benchmark")
-        data_frame.to_csv(f"data/models/stats/latest_benchmark/{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv")
-        return data_frame
+            data_frame2 = concat([data_frame, model_data.as_data_frame()])
+
+            # append to latest_benchmark file
+            with open(filename, "a") as f:
+                # Lock the file before writing to it
+                fcntl.flock(f, fcntl.LOCK_EX)
+                if f.tell() == 0:  # Check if file is empty
+                    f.write(data_frame2.to_csv())  # Write headers when file is empty
+                else:
+                    f.write("\n")
+                    f.write(data_frame2.to_csv(header=False))  # Do not write headers when appending
+                # Unlock the file after writing
+                fcntl.flock(f, fcntl.LOCK_UN)
+
+        threads = []
+        for model in models:
+            thread = threading.Thread(target=run_model, args=(model, repetitions, filename))
+            thread.start()
+            threads.append(thread)
+
+        # Wait for all threads to complete
+        for thread in threads:
+            thread.join()
     
     def create_all_charts(self):
         # Only create the first 4 metrics (F1, Precision, Recall, Accuracy)
