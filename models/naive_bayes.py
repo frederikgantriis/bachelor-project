@@ -1,4 +1,6 @@
 import math
+
+from matplotlib.pylab import f
 import utils
 
 from data_parser import Dataset
@@ -13,7 +15,10 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
         self, dataset: Dataset, model_name="naive-bayes", variation_name=None, k_factor: float=1
     ) -> None:  # pragma: no cover
         if k_factor != 1:
-            variation_name = f"add-k-{k_factor}_" + variation_name
+            if variation_name is None:
+                variation_name = f"add-k-{k_factor}"
+            else:
+                variation_name = f"add-k-{k_factor}_" + variation_name
 
         super().__init__(dataset, model_name, variation_name)  # type: ignore
         # base chance based on the split in classes in the dataset
