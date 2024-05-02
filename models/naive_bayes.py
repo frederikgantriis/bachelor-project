@@ -1,6 +1,5 @@
 import math
 
-from matplotlib.pylab import f
 import utils
 
 from data_parser import Dataset
@@ -12,7 +11,11 @@ from spacy.tokens import Token, Doc
 
 class NaiveBayes(MLAlgorithm):  # pragma: no cover
     def __init__(
-        self, dataset: Dataset, model_name="naive-bayes", variation_name=None, k_factor: float=1
+        self,
+        dataset: Dataset,
+        model_name="naive-bayes",
+        variation_name=None,
+        k_factor: float = 1,
     ) -> None:  # pragma: no cover
         if k_factor != 1:
             if variation_name is None:
@@ -36,7 +39,7 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
 
         self.train_data = TrainData(self.name)
 
-        self.k_factor = k_factor        
+        self.k_factor = k_factor
 
     def train(self):  # pragma: no cover
         for c in self.classes:  # type: ignore

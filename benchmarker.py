@@ -13,11 +13,22 @@ import matplotlib.pyplot as plt
 class Benchmarker:
     def __init__(self, models: list[(MLAlgorithm, Datasets)], repetitions: int) -> None:
         self.test_dataset = Datasets(TEST)
-        self.dataset_labels = [OFF] * len(self.test_dataset.to_dict()[OFF]) + [NOT] * len(self.test_dataset.to_dict()[NOT])
+        self.dataset_labels = [OFF] * len(self.test_dataset.to_dict()[OFF]) + [
+            NOT
+        ] * len(self.test_dataset.to_dict()[NOT])
         self.models = models
         self.benchmark = None
         self.repetitions = repetitions
-        self.metrics = [F1, ACCURACY, PRECISION, RECALL, TRUE_POSITIVES, FALSE_POSITIVES, TRUE_NEGATIVES, FALSE_NEGATIVES]
+        self.metrics = [
+            F1,
+            ACCURACY,
+            PRECISION,
+            RECALL,
+            TRUE_POSITIVES,
+            FALSE_POSITIVES,
+            TRUE_NEGATIVES,
+            FALSE_NEGATIVES,
+        ]
         self.data_frame = None
 
     def _get_benchmark(self):
@@ -33,7 +44,7 @@ class Benchmarker:
 
         if metric == F1:
             return (2 * tp) / ((2 * tp) + fp + fn)
-        elif metric == PRECISION: 
+        elif metric == PRECISION:
             return tp / (tp + tn)
         elif metric == RECALL:
             return tp / (tp + fn)
@@ -48,8 +59,18 @@ class Benchmarker:
         elif metric == FALSE_NEGATIVES:
             return fn
 
-    def count_labels(self, compare_result_label: str, compare_test_label: str, result_labels: list[str]) -> int:
-        return sum(1 for i in range(len(result_labels)) if result_labels[i] == compare_result_label and self.dataset_labels[i] == compare_test_label)
+    def count_labels(
+        self,
+        compare_result_label: str,
+        compare_test_label: str,
+        result_labels: list[str],
+    ) -> int:
+        return sum(
+            1
+            for i in range(len(result_labels))
+            if result_labels[i] == compare_result_label
+            and self.dataset_labels[i] == compare_test_label
+        )
 
     def benchmark_models(self, model_index=None, repetitions=None):
         if repetitions is None:
@@ -63,20 +84,24 @@ class Benchmarker:
 
         filename = f"data/models/stats/latest_benchmark/{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
 
-        data_frame = DataFrame({
-            "model_name": [],
-            F1: [],
-            ACCURACY: [],
-            PRECISION: [],
-            RECALL: [],
-            TRUE_POSITIVES: [],
-            FALSE_POSITIVES: [],
-            TRUE_NEGATIVES: [],
-            FALSE_NEGATIVES: [],
-            "timestamp": [],
-        }) 
+        data_frame = DataFrame(
+            {
+                "model_name": [],
+                F1: [],
+                ACCURACY: [],
+                PRECISION: [],
+                RECALL: [],
+                TRUE_POSITIVES: [],
+                FALSE_POSITIVES: [],
+                TRUE_NEGATIVES: [],
+                FALSE_NEGATIVES: [],
+                "timestamp": [],
+            }
+        )
 
-        data_frame.to_csv(filename, header=True, index=False)  # Save the initial empty dataframe with headers
+        data_frame.to_csv(
+            filename, header=True, index=False
+        )  # Save the initial empty dataframe with headers
 
         def run_model(model, repetitions, filename):
             print(f"Running benchmark for {model[0].name}")
@@ -87,9 +112,13 @@ class Benchmarker:
 
                 result_labels = model[0].test(model[1].to_list())
                 for metric in stats_average.keys():
-                    stats_average[metric] += self.calculate_metric(result_labels, metric)
+                    stats_average[metric] += self.calculate_metric(
+                        result_labels, metric
+                    )
 
-            stats_average = {key: value / self.repetitions for key, value in stats_average.items()}
+            stats_average = {
+                key: value / self.repetitions for key, value in stats_average.items()
+            }
 
             model_data = StatsData(str(model[0]), **stats_average)
 
@@ -102,16 +131,22 @@ class Benchmarker:
                 # Lock the file before writing to it
                 fcntl.flock(f, fcntl.LOCK_EX)
                 if f.tell() == 0:  # Check if file is empty
-                    f.write(data_frame.to_csv(header=True, index=False))  # Write headers when file is empty
+                    f.write(
+                        data_frame.to_csv(header=True, index=False)
+                    )  # Write headers when file is empty
                 else:
                     f.write("\n")
-                    f.write(data_frame.to_csv(header=False, index=False))  # Do not write headers when appending
+                    f.write(
+                        data_frame.to_csv(header=False, index=False)
+                    )  # Do not write headers when appending
                 # Unlock the file after writing
                 fcntl.flock(f, fcntl.LOCK_UN)
 
         threads = []
         for model in models:
-            thread = threading.Thread(target=run_model, args=(model, repetitions, filename))
+            thread = threading.Thread(
+                target=run_model, args=(model, repetitions, filename)
+            )
             thread.start()
             threads.append(thread)
 
@@ -127,7 +162,7 @@ class Benchmarker:
         print(data_frame)
 
         return data_frame
-    
+
     def create_all_charts(self):
         # Only create the first 4 metrics (F1, Precision, Recall, Accuracy)
         for metric in self.metrics[:4]:
@@ -147,13 +182,15 @@ class Benchmarker:
 
         df = DataFrame({metric.capitalize(): metrics}, index=model_names)
 
-        ax = df.plot(kind="bar", figsize=(20, 10), legend=False, title=metric.capitalize())
+        ax = df.plot(
+            kind="bar", figsize=(20, 10), legend=False, title=metric.capitalize()
+        )
 
         # Rotate the x-axis labels for better readability
-        plt.xticks(rotation=45, ha='right')
+        plt.xticks(rotation=45, ha="right")
 
         makedir("img")
-        plt.savefig(f"img/{metric}.png", bbox_inches='tight')
+        plt.savefig(f"img/{metric}.png", bbox_inches="tight")
         plt.close()
 
     def create_diagram_repetition(self):
@@ -190,9 +227,13 @@ class Benchmarker:
         for i in range(len(self.models)):
             model_benchmark = self._get_benchmark()
             result_labels = self.models[i][0].test(self.models[i][1].to_list())
-            self.create_confusion_matrix_for_model(result_labels, model_benchmark["model_name"].values[i])
+            self.create_confusion_matrix_for_model(
+                result_labels, model_benchmark["model_name"].values[i]
+            )
 
-    def create_confusion_matrix_for_model(self, result_labels: list[str], model_name: str):
+    def create_confusion_matrix_for_model(
+        self, result_labels: list[str], model_name: str
+    ):
         tp = self.count_labels(OFF, OFF, result_labels)
         tn = self.count_labels(NOT, NOT, result_labels)
         fp = self.count_labels(OFF, NOT, result_labels)
@@ -239,31 +280,65 @@ class Benchmarker:
     def get_common_wrongly_classified(self):
         wrongly_classified = {}
         basic_train_dataset = Datasets(TRAIN).to_dict()
-        words_set = set(word.text for data in basic_train_dataset[OFF] + basic_train_dataset[NOT] for word in data)
+        words_set = set(
+            word.text
+            for data in basic_train_dataset[OFF] + basic_train_dataset[NOT]
+            for word in data
+        )
 
         for model, dataset in self.models:
             result_labels = model.test(dataset.to_list())
 
-            for result_label, dataset_label, comment in zip(result_labels, self.dataset_labels, self.test_dataset.to_list()):
+            for result_label, dataset_label, comment in zip(
+                result_labels, self.dataset_labels, self.test_dataset.to_list()
+            ):
                 if result_label != dataset_label:
                     comment_words = [word.text for word in comment]
-                    common_words = [word for word in comment_words if word not in words_set]
+                    common_words = [
+                        word for word in comment_words if word not in words_set
+                    ]
                     if comment not in wrongly_classified:
-                        wrongly_classified[comment] = [dataset_label, result_label, 1, common_words, [model.name]]
+                        wrongly_classified[comment] = [
+                            dataset_label,
+                            result_label,
+                            1,
+                            common_words,
+                            [model.name],
+                        ]
                     else:
                         wrongly_classified[comment][2] += 1
                         wrongly_classified[comment][4].append(model.name)
 
-        wrongly_classified_list = [[k, *v] for k, v in wrongly_classified.items() if v[2] > 1]
-        df = DataFrame(wrongly_classified_list, columns=["Comment", "Actual", "Predicted", "Amount of models", "Words not in train dataset", "Models"])
+        wrongly_classified_list = [
+            [k, *v] for k, v in wrongly_classified.items() if v[2] > 1
+        ]
+        df = DataFrame(
+            wrongly_classified_list,
+            columns=[
+                "Comment",
+                "Actual",
+                "Predicted",
+                "Amount of models",
+                "Words not in train dataset",
+                "Models",
+            ],
+        )
         df.to_csv("data/models/stats/wrongly-classified/common-wrongly-classified.csv")
 
-    def get_wrongly_classified_for_model(self, result_labels: list[str], model_name: str):
+    def get_wrongly_classified_for_model(
+        self, result_labels: list[str], model_name: str
+    ):
         dataset = next((d for m, d in self.models if m.name == model_name), None)
         if dataset:
-            wrongly_classified = [[dataset_label, result_label, comment] 
-                                  for dataset_label, result_label, comment in zip(self.dataset_labels, result_labels, self.test_dataset.to_list()) 
-                                  if result_label != dataset_label]
+            wrongly_classified = [
+                [dataset_label, result_label, comment]
+                for dataset_label, result_label, comment in zip(
+                    self.dataset_labels, result_labels, self.test_dataset.to_list()
+                )
+                if result_label != dataset_label
+            ]
 
-            df = DataFrame(wrongly_classified, columns=["Actual", "Predicted", "Comment"])
+            df = DataFrame(
+                wrongly_classified, columns=["Actual", "Predicted", "Comment"]
+            )
             df.to_csv(f"data/models/stats/wrongly-classified/{model_name}.csv")

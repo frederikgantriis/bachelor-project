@@ -22,10 +22,21 @@ class SVM(MLAlgorithm):
         self.df = pd.DataFrame(self.data)
 
         self.variation_name = ""
-        self.svm_model = make_pipeline(FeatureUnion([
-            ('word_tfidf', TfidfVectorizer(analyzer='word', ngram_range=(1, 2))),
-            ('char_tfidf', TfidfVectorizer(analyzer='char', ngram_range=(2, 4)))
-        ]), SVC(kernel='linear', C=10))
+        self.svm_model = make_pipeline(
+            FeatureUnion(
+                [
+                    (
+                        "word_tfidf",
+                        TfidfVectorizer(analyzer="word", ngram_range=(1, 2)),
+                    ),
+                    (
+                        "char_tfidf",
+                        TfidfVectorizer(analyzer="char", ngram_range=(2, 4)),
+                    ),
+                ]
+            ),
+            SVC(kernel="linear", C=10),
+        )
         self.is_trained = False
 
     def train(self):
