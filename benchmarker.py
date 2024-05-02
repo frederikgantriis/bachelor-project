@@ -1,12 +1,11 @@
-from datetime import date
 import datetime
 import fcntl
-from pandas import DataFrame, concat
+from pandas import DataFrame, read_csv
 from data_storage import StatsData
 from data_parser import Datasets
 from constants import *
 from models.ml_algorithm import MLAlgorithm
-from utils import clear, makedir
+from utils import makedir
 import threading
 import matplotlib.pyplot as plt
 
@@ -18,7 +17,7 @@ class Benchmarker:
         self.models = models
         self.benchmark = None
         self.repetitions = repetitions
-        self.metrics = [F1, PRECISION, RECALL, ACCURACY, TRUE_POSITIVES, FALSE_POSITIVES, TRUE_NEGATIVES, FALSE_NEGATIVES]
+        self.metrics = [F1, ACCURACY, PRECISION, RECALL, TRUE_POSITIVES, FALSE_POSITIVES, TRUE_NEGATIVES, FALSE_NEGATIVES]
         self.data_frame = None
 
     def _get_benchmark(self):
@@ -66,27 +65,25 @@ class Benchmarker:
 
         data_frame = DataFrame({
             "model_name": [],
-            "f1": [],
-            "accuracy": [],
-            "precision": [],
-            "recall": [],
-            "true_positives": [],
-            "false_positives": [],
-            "true_negatives": [],
-            "false_negatives": [],
-            "timestamp": []
+            F1: [],
+            ACCURACY: [],
+            PRECISION: [],
+            RECALL: [],
+            TRUE_POSITIVES: [],
+            FALSE_POSITIVES: [],
+            TRUE_NEGATIVES: [],
+            FALSE_NEGATIVES: [],
+            "timestamp": [],
         }) 
 
-        data_frame.to_csv(filename)  # Save the initial empty dataframe with headers
+        data_frame.to_csv(filename, header=True, index=False)  # Save the initial empty dataframe with headers
 
         def run_model(model, repetitions, filename):
-            print(f"Running benchmark for {model[0].name}", end="\r")
+            print(f"Running benchmark for {model[0].name}")
             stats_average = {metric: 0 for metric in self.metrics}
 
-            data_frame2 = None
-
             for _ in range(repetitions):
-                print(f"Repetition: {_ + 1}/{repetitions}", end="\r")
+                print(f"Repetition: {_ + 1}/{repetitions}")
 
                 result_labels = model[0].test(model[1].to_list())
                 for metric in stats_average.keys():
@@ -96,21 +93,19 @@ class Benchmarker:
 
             model_data = StatsData(str(model[0]), **stats_average)
 
-            data_frame2 = concat([data_frame, model_data.as_data_frame()], ignore_index=True) if data_frame is not None else model_data.as_data_frame()
+            data_frame = model_data.as_data_frame()
 
             model_data.save_to_disk()
-
-            data_frame2 = concat([data_frame, model_data.as_data_frame()])
 
             # append to latest_benchmark file
             with open(filename, "a") as f:
                 # Lock the file before writing to it
                 fcntl.flock(f, fcntl.LOCK_EX)
                 if f.tell() == 0:  # Check if file is empty
-                    f.write(data_frame2.to_csv())  # Write headers when file is empty
+                    f.write(data_frame.to_csv(header=True, index=False))  # Write headers when file is empty
                 else:
                     f.write("\n")
-                    f.write(data_frame2.to_csv(header=False))  # Do not write headers when appending
+                    f.write(data_frame.to_csv(header=False, index=False))  # Do not write headers when appending
                 # Unlock the file after writing
                 fcntl.flock(f, fcntl.LOCK_UN)
 
@@ -123,14 +118,23 @@ class Benchmarker:
         # Wait for all threads to complete
         for thread in threads:
             thread.join()
+
+        # Read the latest benchmark file
+        data_frame = read_csv(filename)
+
+        data_frame = data_frame.sort_values(by=[F1], ascending=True)
+
+        print(data_frame)
+
+        return data_frame
     
     def create_all_charts(self):
         # Only create the first 4 metrics (F1, Precision, Recall, Accuracy)
         for metric in self.metrics[:4]:
             self.create_bar_chart(metric)
 
-        self.create_diagram_repetition()
-        self.create_confusion_matrix()
+        # self.create_diagram_repetition()
+        # self.create_confusion_matrix()
 
     def create_bar_chart(self, metric: str):
         metrics = []
@@ -143,10 +147,13 @@ class Benchmarker:
 
         df = DataFrame({metric.capitalize(): metrics}, index=model_names)
 
-        df.plot(kind="bar", figsize=(20, 10), legend=False, title=metric.capitalize())
+        ax = df.plot(kind="bar", figsize=(20, 10), legend=False, title=metric.capitalize())
+
+        # Rotate the x-axis labels for better readability
+        plt.xticks(rotation=45, ha='right')
 
         makedir("img")
-        plt.savefig(f"img/{metric}.png")
+        plt.savefig(f"img/{metric}.png", bbox_inches='tight')
         plt.close()
 
     def create_diagram_repetition(self):
