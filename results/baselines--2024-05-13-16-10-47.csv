@@ -1,0 +1,5 @@
+model_name,f1,accuracy,precision,recall,true_positives,false_positives,true_negatives,false_negatives,timestamp
+
+baseline-random,0.20121331022361963,0.5009118541033435,0.12496193981844209,0.502439024390244,20.6,143.8,144.2,20.4,2024-05-13 16:10:47.333035
+
+baseline-majority,0.0,0.8753799392097263,0.0,0.0,0.0,0.0,288.0,41.0,2024-05-13 16:10:47.334981
