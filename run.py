@@ -84,29 +84,69 @@ def add_svm_models(train_datasets, test_datasets, variation_names):
 if __name__ == "__main__":
     # Load the dataset
 
-    train = [
-        Datasets(TRAIN)
-        .remove_stop_words()
-        .lemmatize()
-        .extract_unique_words()
-        .remove_dots()
-        .lowercase()
-    ]
-    test = [
-        Datasets(TEST)
-        .remove_stop_words()
-        .lemmatize()
-        .extract_unique_words()
-        .remove_dots()
-        .lowercase()
-    ]
-    name = ["remove_stop_words_lemmatize_extract_unique_words_remove_dots_lowercase"]
-    to_be_benchmarked = add_ngram_logistic_regression_models(train, test, name)
-    for _ in range(49):
-        # Add ngram logistic regression models to the list
-        to_be_benchmarked += add_ngram_logistic_regression_models(train, test, name)
+    # train = [
+    #     Datasets(TRAIN)
+    #     .remove_stop_words()
+    #     .lemmatize()
+    #     .extract_unique_words()
+    #     .remove_dots()
+    #     .lowercase()
+    # ]
+    # test = [
+    #     Datasets(TEST)
+    #     .remove_stop_words()
+    #     .lemmatize()
+    #     .extract_unique_words()
+    #     .remove_dots()
+    #     .lowercase()
+    # ]
+    # name = ["remove_stop_words_lemmatize_extract_unique_words_remove_dots_lowercase"]
+    # to_be_benchmarked = add_ngram_logistic_regression_models(train, test, name)
+    # for _ in range(49):
+    #     # Add ngram logistic regression models to the list
+    #     to_be_benchmarked += add_ngram_logistic_regression_models(train, test, name)
 
-    benchmarker = Benchmarker(to_be_benchmarked, 1)
+    # benchmarker = Benchmarker(to_be_benchmarked, 1)
+
+    # # Print the results of benchmarking the models
+    # benchmarker.benchmark_models()
+
+    test_dataset = get_all_remove_duplicates_combinations(TEST)
+    variation_names = get_all_remove_duplicates_variations()
+
+    if len(variation_names) != len(test_dataset):
+        raise ValueError(
+            "Number of variations and number of test datasets do not match"
+        )
+    train_dataset = get_all_remove_duplicates_combinations(TRAIN)
+
+    # Add BaselineRandom and BaselineMajority models to the list
+    to_be_benchmarked = add_baseline_models(train_dataset, test_dataset, variation_names)
+
+    # Add NaiveBayes models to the list
+    to_be_benchmarked += add_standard_naive_bayes_models(
+        train_dataset, test_dataset, variation_names
+    )
+
+    # Add NaiveBayes models with varying k_factors to the list
+    to_be_benchmarked += add_naive_bayes_models_with_k_factors(
+        train_dataset, test_dataset, variation_names
+    )
+
+    # Add LogisticRegression models to the list
+    to_be_benchmarked += add_logistic_regression_models(
+        train_dataset, test_dataset, variation_names
+    )
+
+    # Add ngram LogisticRegression models to the list
+    to_be_benchmarked += add_ngram_logistic_regression_models(
+        train_dataset, test_dataset, variation_names
+    )
+
+    # Add SVM models to the list
+    to_be_benchmarked += add_svm_models(train_dataset, test_dataset, variation_names)
+
+    benchmarker = Benchmarker(to_be_benchmarked, 10)
 
     # Print the results of benchmarking the models
     benchmarker.benchmark_models()
