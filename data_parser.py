@@ -100,14 +100,27 @@ class Datasets(object):
         self.dataset = self._sanitize_dataset(self.dataset, method)
         self._save_to_disk()
         return self
-    
-    def extract_unique_words(self):
+
+    def shuffle(self):
         """extracts unique words from the dataset"""
-        self.dataset_type = self.dataset_type + "_extract_unique_words"
+        self.dataset_type = self.dataset_type + "_shuffle"
         if self._try_load_from_disk():
             return self
-        
-        method: Callable[[list[Token]], list[Token]] = lambda lst: list(set(lst))
+
+        method: Callable[[list[Token]], list[Token]
+                         ] = lambda lst: list(set(lst))
+        self.dataset = self._sanitize_dataset(self.dataset, method)
+        self._save_to_disk()
+        return self
+
+    def remove_duplicates(self):
+        """extracts unique words from the dataset"""
+        self.dataset_type = self.dataset_type + "_remove_duplicates"
+        if self._try_load_from_disk():
+            return self
+
+        method: Callable[[list[Token]], list[Token]
+                         ] = lambda lst: list(dict([(i.text, i) for i in lst]).values())
         self.dataset = self._sanitize_dataset(self.dataset, method)
         self._save_to_disk()
         return self
@@ -174,4 +187,4 @@ class Datasets(object):
         self.storage.save_to_disk(self.dataset, self.folder_path, disk_path)
 
     def get_all_attributes(self):
-        return ["remove_dots", "remove_stop_words", "lowercase", "lemmatize", "extract_unique_words"]
+        return ["remove_dots", "remove_stop_words", "lowercase", "lemmatize", "remove_duplicates"]

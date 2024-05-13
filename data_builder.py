@@ -88,11 +88,11 @@ def get_best_naive_bayes_train():
         .remove_dots()
         .lemmatize()
         .remove_stop_words()
-        .extract_unique_words(),
+        .remove_duplicates(),
         Datasets(TRAIN)
         .remove_dots()
         .lowercase()
-        .extract_unique_words()
+        .remove_duplicates()
         .lemmatize()
         .remove_stop_words(),
         Datasets(TRAIN)
@@ -100,20 +100,23 @@ def get_best_naive_bayes_train():
         .remove_stop_words()
         .lowercase()
         .lemmatize()
-        .extract_unique_words(),
+        .remove_duplicates(),
         Datasets(TRAIN)
         .remove_stop_words()
         .lowercase()
         .remove_dots()
         .lemmatize()
-        .extract_unique_words(),
-        Datasets(TRAIN).remove_dots().remove_stop_words().lowercase().lemmatize(),
-        Datasets(TRAIN).remove_dots().lowercase().remove_stop_words().lemmatize(),
-        Datasets(TRAIN).remove_stop_words().remove_dots().lowercase().lemmatize(),
+        .remove_duplicates(),
+        Datasets(TRAIN).remove_dots(
+        ).remove_stop_words().lowercase().lemmatize(),
+        Datasets(TRAIN).remove_dots().lowercase(
+        ).remove_stop_words().lemmatize(),
+        Datasets(TRAIN).remove_stop_words(
+        ).remove_dots().lowercase().lemmatize(),
         Datasets(TRAIN)
         .remove_stop_words()
         .remove_dots()
-        .extract_unique_words()
+        .remove_duplicates()
         .lowercase()
         .lemmatize(),
     ]
@@ -126,11 +129,11 @@ def get_best_naive_bayes_test():
         .remove_dots()
         .lemmatize()
         .remove_stop_words()
-        .extract_unique_words(),
+        .remove_duplicates(),
         Datasets(TEST)
         .remove_dots()
         .lowercase()
-        .extract_unique_words()
+        .remove_duplicates()
         .lemmatize()
         .remove_stop_words(),
         Datasets(TEST)
@@ -138,20 +141,23 @@ def get_best_naive_bayes_test():
         .remove_stop_words()
         .lowercase()
         .lemmatize()
-        .extract_unique_words(),
+        .remove_duplicates(),
         Datasets(TEST)
         .remove_stop_words()
         .lowercase()
         .remove_dots()
         .lemmatize()
-        .extract_unique_words(),
-        Datasets(TEST).remove_dots().remove_stop_words().lowercase().lemmatize(),
-        Datasets(TEST).remove_dots().lowercase().remove_stop_words().lemmatize(),
-        Datasets(TEST).remove_stop_words().remove_dots().lowercase().lemmatize(),
+        .remove_duplicates(),
+        Datasets(TEST).remove_dots(
+        ).remove_stop_words().lowercase().lemmatize(),
+        Datasets(TEST).remove_dots().lowercase(
+        ).remove_stop_words().lemmatize(),
+        Datasets(TEST).remove_stop_words(
+        ).remove_dots().lowercase().lemmatize(),
         Datasets(TEST)
         .remove_stop_words()
         .remove_dots()
-        .extract_unique_words()
+        .remove_duplicates()
         .lowercase()
         .lemmatize(),
     ]
@@ -159,12 +165,12 @@ def get_best_naive_bayes_test():
 
 def get_best_naive_bayes_variations():
     return [
-        "lowercase_remove_dots_lemmatize_remove_stop_words_extract_unique_words",
-        "remove_dots_lowercase_extract_unique_words_lemmatize_remove_stop_words",
-        "remove_dots_remove_stop_words_lowercase_lemmatize_extract_unique_words",
-        "remove_stop_words_lowercase_remove_dots_lemmatize_extract_unique_words",
+        "lowercase_remove_dots_lemmatize_remove_stop_words_remove_duplicates",
+        "remove_dots_lowercase_remove_duplicates_lemmatize_remove_stop_words",
+        "remove_dots_remove_stop_words_lowercase_lemmatize_remove_duplicates",
+        "remove_stop_words_lowercase_remove_dots_lemmatize_remove_duplicates",
         "remove_dots_remove_stop_words_lowercase_lemmatize",
         "remove_dots_lowercase_remove_stop_words_lemmatize",
         "remove_stop_words_remove_dots_lowercase_lemmatize",
-        "remove_stop_words_remove_dots_extract_unique_words_lowercase_lemmatize",
+        "remove_stop_words_remove_dots_remove_duplicates_lowercase_lemmatize",
     ]
