@@ -18,6 +18,7 @@ class SVM(MLAlgorithm):
     def __init__(self, dataset: DatasetDict, variation_name=None) -> None:
         super().__init__(dataset, "svm", variation_name)
 
+        self.data = {}
         off = [(x, "OFF") for x in self.dataset["OFF"]]
         not_off = [(x, "NOT") for x in self.dataset["NOT"]]
         self.list = off + not_off
