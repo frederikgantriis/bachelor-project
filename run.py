@@ -49,7 +49,8 @@ def add_logistic_regression_models(train_datasets, test_datasets, variation_name
     # Add LogisticRegression models to the list
     return [
         (
-            LogisticRegression(train_datasets[i], variation_name=variation_names[i]),
+            LogisticRegression(
+                train_datasets[i], variation_name=variation_names[i]),
             test_datasets[i],
         )
         for i in range(len(train_datasets))
@@ -82,23 +83,20 @@ def add_svm_models(train_datasets, test_datasets, variation_names):
 
 
 if __name__ == "__main__":
+    # # remove dots lowercase remove stop words lemmatize
+    # train_data2 = Datasets("train").remove_dots(
+    # ).lowercase().remove_stop_words().lemmatize()
 
-    # Get the names of all variations
-    variation_names = get_variations()
-    # Get all training datasets
-    train_datasets = get_train_datasets()
-    # Get all testing datasets
-    test_datasets = get_test_datasets()
+    # test_data2 = Datasets("test").remove_dots(
+    # ).lowercase().remove_stop_words().lemmatize()
 
     # For each training dataset, create a NaiveBayes model and pair it with the corresponding test dataset
     to_be_benchmarked = add_standard_naive_bayes_models(
         train_datasets, test_datasets, variation_names
     )
 
-    # Add more NaiveBayes models to the list, this time with varying k_factor values
-    to_be_benchmarked += add_naive_bayes_models_with_k_factors(
-        train_datasets, test_datasets, variation_names
-    )
+    svm = SVM(train_data)
+    svm.train()
 
     # Add LogisticRegression models to the list
     to_be_benchmarked += add_logistic_regression_models(
