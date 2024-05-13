@@ -121,32 +121,46 @@ if __name__ == "__main__":
     train_dataset = get_all_remove_duplicates_combinations(TRAIN)
 
     # Add BaselineRandom and BaselineMajority models to the list
-    to_be_benchmarked = add_baseline_models(train_dataset, test_dataset, variation_names)
+    to_be_benchmarked = add_baseline_models(
+        train_dataset, test_dataset, variation_names
+    )
+
+    benchmarker = Benchmarker(to_be_benchmarked, 10)
+    benchmarker.benchmark_models()
 
     # Add NaiveBayes models to the list
     to_be_benchmarked += add_standard_naive_bayes_models(
         train_dataset, test_dataset, variation_names
     )
 
+    benchmarker = Benchmarker(to_be_benchmarked, 10)
+    benchmarker.benchmark_models()
+
     # Add NaiveBayes models with varying k_factors to the list
     to_be_benchmarked += add_naive_bayes_models_with_k_factors(
         train_dataset, test_dataset, variation_names
     )
+
+    benchmarker = Benchmarker(to_be_benchmarked, 10)
+    benchmarker.benchmark_models()
 
     # Add LogisticRegression models to the list
     to_be_benchmarked += add_logistic_regression_models(
         train_dataset, test_dataset, variation_names
     )
 
+    benchmarker = Benchmarker(to_be_benchmarked, 10)
+    benchmarker.benchmark_models()
+
     # Add ngram LogisticRegression models to the list
     to_be_benchmarked += add_ngram_logistic_regression_models(
         train_dataset, test_dataset, variation_names
     )
 
-    # Add SVM models to the list
+    benchmarker = Benchmarker(to_be_benchmarked, 10)
+    benchmarker.benchmark_models()
+
     to_be_benchmarked += add_svm_models(train_dataset, test_dataset, variation_names)
 
     benchmarker = Benchmarker(to_be_benchmarked, 10)
-
-    # Print the results of benchmarking the models
     benchmarker.benchmark_models()
