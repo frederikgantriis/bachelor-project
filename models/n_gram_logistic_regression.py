@@ -1,28 +1,30 @@
-import numpy
-import pandas as pd
 
 from numpy.random import permutation
-from datasets import DatasetDict
 from data_parser import Dataset
 from models.logistic_regression import LogisticRegression
 from constants import OFF, NOT
 from sklearn.feature_extraction.text import CountVectorizer
+from collections import defaultdict
 
 
 class NGramLogisticRegression(LogisticRegression):
-    def __init__(self, dataset: Dataset, model_name=None, variation_name=None) -> None:
+    def __init__(self, dataset: Dataset, variation_name="") -> None:
         super().__init__(dataset, "n_grams_"+ variation_name)
-        vocabolary = []
+        vocabulary = []
+        
+        self.nCharMin, self.nCharMax = 2,4
+        self.nWordMin, self.nWordMax = 1,1
+
 
         for comment in dataset.to_list():
-            vocabolary.append(comment.text)
+            vocabulary.append(comment.text)
 
-        vectorizer = CountVectorizer(analyzer='char', ngram_range=(2, 4))
-        vectorizer.fit_transform(vocabolary)
+        vectorizer = CountVectorizer(analyzer='char', ngram_range=(self.nCharMin, self.nCharMax))
+        vectorizer.fit_transform(vocabulary)
         self.weights = dict().fromkeys(vectorizer.get_feature_names_out(), 0)
 
-        vectorizer = CountVectorizer(analyzer='word', ngram_range=(0, 0))
-        vectorizer.fit_transform(vocabolary)
+        vectorizer = CountVectorizer(analyzer='word', ngram_range=(self.nWordMin, self.nWordMax))
+        vectorizer.fit_transform(vocabulary)
         x = dict().fromkeys(vectorizer.get_feature_names_out(), 0)
         self.weights.update(x)
 
@@ -38,10 +40,9 @@ class NGramLogisticRegression(LogisticRegression):
                 comment = self.dataset[NOT][i - len(self.dataset[OFF])]
 
             features = self.calculate_features(comment)
-            # [x * y for x, y in zip(self.weights, features)]
             vector_product = 0
-            for feat in features:
-                vector_product += self.weights[feat]
+            for feat in features.keys():
+                vector_product += self.weights[feat] * features[feat]
             guess = self.sigmoid(vector_product + self.bias_term)
             self.gradient_descent(
                 features, self.crossentropy_loss(
@@ -56,27 +57,27 @@ class NGramLogisticRegression(LogisticRegression):
             loss (float): A number giving value to how far the guess is from the right answer
             trainingspeed (float): Dictates how fast the weights change
         """
-        for feat in features:
-            self.weights[feat] += (loss * 1) * (trainingspeed)
+        for feat in features.keys():
+            self.weights[feat] += (loss * features[feat]) * (trainingspeed)
 
         self.bias_term += loss * trainingspeed
 
     def calculate_features(self, comment):
-        features = []
+        features = defaultdict(int)
         try:
-            vectorizer = CountVectorizer(analyzer='char', ngram_range=(2, 4))
+            vectorizer = CountVectorizer(analyzer='char', ngram_range=(self.nCharMin, self.nCharMax))
             vectorizer.fit_transform([comment.text])
 
             for feat in vectorizer.get_feature_names_out():
                 if feat in self.weights:
-                    features.append(feat)
+                    features[feat] += 1
 
-            vectorizer = CountVectorizer(analyzer='word', ngram_range=(0, 0))
+            vectorizer = CountVectorizer(analyzer='word', ngram_range=(self.nWordMin, self.nWordMax))
             vectorizer.fit_transform([comment.text])
 
             for feat in vectorizer.get_feature_names_out():
                 if feat in self.weights:
-                    features.append(feat) 
+                    features[feat] += 1
         except ValueError:
             None
         return features
@@ -87,7 +88,6 @@ class NGramLogisticRegression(LogisticRegression):
 
         for test in test_dataset_text:
             features = self.calculate_features(test)
-            # [x * y for x, y in zip(self.weights, features)]
             vector_product = 0
             for feat in features:
                 vector_product += self.weights[feat]

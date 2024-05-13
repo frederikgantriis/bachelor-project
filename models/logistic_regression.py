@@ -1,5 +1,6 @@
 import numpy
 import pandas as pd
+import scipy.special
 
 from numpy.random import permutation
 from datasets import DatasetDict
@@ -29,8 +30,7 @@ class LogisticRegression(MLAlgorithm):
         pos_words.close()
 
     def sigmoid(self, x):
-        z = numpy.exp(-x)
-        return float(1 / (1 + z))
+        return scipy.special.expit(x)
 
     def is_hateful(self, word: str) -> bool:
         return word.lower() in self.hateful_words

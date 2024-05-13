@@ -1,20 +1,22 @@
 from random import shuffle
 import pandas as pd
 
-from numpy.random import permutation
 from datasets import DatasetDict
 from sklearn.pipeline import FeatureUnion, make_pipeline
 from sklearn.svm import SVC
 from models.ml_algorithm import MLAlgorithm
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
+from models.ml_algorithm import MLAlgorithm
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.svm import SVC
 
 
 class SVM(MLAlgorithm):
     def __init__(self, dataset: DatasetDict, variation_name=None) -> None:
         super().__init__(dataset, "svm", variation_name)
 
-        self.data = {}
         off = [(x, "OFF") for x in self.dataset["OFF"]]
         not_off = [(x, "NOT") for x in self.dataset["NOT"]]
         self.list = off + not_off

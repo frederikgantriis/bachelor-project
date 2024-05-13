@@ -1,3 +1,5 @@
+from datetime import date
+import datetime
 from pandas import DataFrame, concat
 from data_storage import StatsData
 from data_parser import Datasets
@@ -9,8 +11,8 @@ import matplotlib.pyplot as plt
 
 class Benchmarker:
     def __init__(self, models: list[(MLAlgorithm, Datasets)], repetitions: int) -> None:
-        test_dataset = Datasets(TEST)
-        self.dataset_labels = [OFF] * len(test_dataset.to_dict()[OFF]) + [NOT] * len(test_dataset.to_dict()[NOT])
+        self.test_dataset = Datasets(TEST)
+        self.dataset_labels = [OFF] * len(self.test_dataset.to_dict()[OFF]) + [NOT] * len(self.test_dataset.to_dict()[NOT])
         self.models = models
         self.benchmark = None
         self.repetitions = repetitions
@@ -57,9 +59,12 @@ class Benchmarker:
 
         for model in models:
             stats_average = {metric: 0 for metric in self.metrics}
-            print(f"Running benchmark for {model[0]}")
+            # print "Running benchmark for model_name" but only update model_name
+            print(f"Running benchmark for {model[0].name}", end="\r")
 
             for _ in range(repetitions):
+                print(f"Repetition: {_ + 1}/{repetitions}", end="\r")
+
                 result_labels = model[0].test(model[1].to_list())
                 for metric in stats_average.keys():
                     stats_average[metric] += self.calculate_metric(result_labels, metric)
@@ -73,7 +78,8 @@ class Benchmarker:
             model_data.save_to_disk()
             clear()
 
-        data_frame.to_csv("data/models/stats/latest_benchmark.csv")
+        makedir("data/models/stats/latest_benchmark")
+        data_frame.to_csv(f"data/models/stats/latest_benchmark/{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv")
         return data_frame
     
     def create_all_charts(self):
@@ -169,3 +175,46 @@ class Benchmarker:
         makedir(f"img/{model_name}")
         plt.savefig(f"img/{model_name}/confusion_matrix.png")
         plt.close()
+
+    def get_wrongly_classified(self):
+        makedir("data/models/stats/wrongly-classified")
+
+        for model, dataset in self.models:
+            print(f"Getting wrongly classified for {model.name}", end="\r")
+
+            result_labels = model.test(dataset.to_list())
+            self.get_wrongly_classified_for_model(result_labels, model.name)
+
+        self.get_common_wrongly_classified()
+
+    def get_common_wrongly_classified(self):
+        wrongly_classified = {}
+        basic_train_dataset = Datasets(TRAIN).to_dict()
+        words_set = set(word.text for data in basic_train_dataset[OFF] + basic_train_dataset[NOT] for word in data)
+
+        for model, dataset in self.models:
+            result_labels = model.test(dataset.to_list())
+
+            for result_label, dataset_label, comment in zip(result_labels, self.dataset_labels, self.test_dataset.to_list()):
+                if result_label != dataset_label:
+                    comment_words = [word.text for word in comment]
+                    common_words = [word for word in comment_words if word not in words_set]
+                    if comment not in wrongly_classified:
+                        wrongly_classified[comment] = [dataset_label, result_label, 1, common_words, [model.name]]
+                    else:
+                        wrongly_classified[comment][2] += 1
+                        wrongly_classified[comment][4].append(model.name)
+
+        wrongly_classified_list = [[k, *v] for k, v in wrongly_classified.items() if v[2] > 1]
+        df = DataFrame(wrongly_classified_list, columns=["Comment", "Actual", "Predicted", "Amount of models", "Words not in train dataset", "Models"])
+        df.to_csv("data/models/stats/wrongly-classified/common-wrongly-classified.csv")
+
+    def get_wrongly_classified_for_model(self, result_labels: list[str], model_name: str):
+        dataset = next((d for m, d in self.models if m.name == model_name), None)
+        if dataset:
+            wrongly_classified = [[dataset_label, result_label, comment] 
+                                  for dataset_label, result_label, comment in zip(self.dataset_labels, result_labels, self.test_dataset.to_list()) 
+                                  if result_label != dataset_label]
+
+            df = DataFrame(wrongly_classified, columns=["Actual", "Predicted", "Comment"])
+            df.to_csv(f"data/models/stats/wrongly-classified/{model_name}.csv")
