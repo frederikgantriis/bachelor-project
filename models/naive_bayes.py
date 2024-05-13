@@ -1,4 +1,5 @@
 import math
+
 import utils
 
 from data_parser import Dataset
@@ -10,10 +11,17 @@ from spacy.tokens import Token, Doc
 
 class NaiveBayes(MLAlgorithm):  # pragma: no cover
     def __init__(
-        self, dataset: Dataset, model_name="naive-bayes", variation_name=None, k_factor: float=1
+        self,
+        dataset: Dataset,
+        model_name="naive-bayes",
+        variation_name=None,
+        k_factor: float = 1,
     ) -> None:  # pragma: no cover
         if k_factor != 1:
-            variation_name = f"add-k-{k_factor}_" + variation_name
+            if variation_name is None:
+                variation_name = f"add-k-{k_factor}"
+            else:
+                variation_name = f"add-k-{k_factor}_" + variation_name
 
         super().__init__(dataset, model_name, variation_name)  # type: ignore
         # base chance based on the split in classes in the dataset
@@ -31,7 +39,7 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
 
         self.train_data = TrainData(self.name)
 
-        self.k_factor = k_factor        
+        self.k_factor = k_factor
 
     def train(self):  # pragma: no cover
         for c in self.classes:  # type: ignore

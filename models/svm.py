@@ -10,6 +10,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from models.ml_algorithm import MLAlgorithm
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
+
 from sklearn.svm import SVC
 
 
@@ -29,16 +30,29 @@ class SVM(MLAlgorithm):
         self.df = pd.DataFrame(self.data)
 
         self.variation_name = ""
-        self.svm_model = make_pipeline(FeatureUnion([
-            ('word_tfidf', TfidfVectorizer(analyzer='word', ngram_range=(1, 2))),
-            ('char_tfidf', TfidfVectorizer(analyzer='char', ngram_range=(2, 4)))
-        ]), SVC(kernel='linear', C=10))
+        self.svm_model = make_pipeline(
+            FeatureUnion(
+                [
+                    (
+                        "word_tfidf",
+                        TfidfVectorizer(analyzer="word", ngram_range=(1, 2)),
+                    ),
+                    (
+                        "char_tfidf",
+                        TfidfVectorizer(analyzer="char", ngram_range=(2, 4)),
+                    ),
+                ]
+            ),
+            SVC(kernel="linear", C=10),
+        )
+        self.is_trained = False
 
     def train(self):
         self.svm_model.fit(self.X, self.y)
+        self.is_trained = True
 
     def test(self, test_dataset_text):
-        if self.svm_model is None:
+        if not self.is_trained:
             self.train()
 
         results = []

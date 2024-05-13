@@ -39,7 +39,11 @@ class LogisticRegression(MLAlgorithm):
         return word.lower() in self.positive_words
 
     def crossentropy_loss(self, guess, expected):
-        return -numpy.log10(guess + 1e-10) if expected == 1 else -numpy.log10(1 - guess + 1e-10)
+        return (
+            -numpy.log10(guess + 1e-10)
+            if expected == 1
+            else -numpy.log10(1 - guess + 1e-10)
+        )
 
     def gradient_descent(self, features, loss, trainingspeed):
         """Finds gradient vector and moves the opposite way
@@ -49,8 +53,7 @@ class LogisticRegression(MLAlgorithm):
             loss (float): A number giving value to how far the guess is from the right answer
             trainingspeed (float): Dictates how fast the weights change
         """
-        new_weights = [(loss * feature) * (trainingspeed)
-                       for feature in features]
+        new_weights = [(loss * feature) * (trainingspeed) for feature in features]
 
         self.weights = [x + y for x, y in zip(self.weights, new_weights)]
         self.bias_term += loss * trainingspeed
@@ -70,8 +73,9 @@ class LogisticRegression(MLAlgorithm):
             vector_product = [x * y for x, y in zip(self.weights, features)]
             guess = self.sigmoid(sum(vector_product) + self.bias_term)
             self.gradient_descent(
-                features, self.crossentropy_loss(
-                    guess, expected), 0.1 if expected == 1 else -0.1
+                features,
+                self.crossentropy_loss(guess, expected),
+                0.1 if expected == 1 else -0.1,
             )
 
     def calculate_features(self, comment):
@@ -90,7 +94,7 @@ class LogisticRegression(MLAlgorithm):
                 features[0] += 1
             elif self.is_positive(word.text):
                 features[1] += 1
-            
+
             if word.text == "!":
                 features[2] = 1
             if word.text == "!":
