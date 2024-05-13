@@ -45,7 +45,7 @@ class Benchmarker:
         if metric == F1:
             return (2 * tp) / ((2 * tp) + fp + fn)
         elif metric == PRECISION:
-            return tp / (tp + tn)
+            return tp / (tp + fp) if tp + fp != 0 else 0
         elif metric == RECALL:
             return tp / (tp + fn)
         elif metric == ACCURACY:
@@ -77,12 +77,14 @@ class Benchmarker:
             repetitions = self.repetitions
         if self.benchmark is not None:
             return self.benchmark
-        models = [self.models[model_index]] if model_index is not None else self.models
+        models = [self.models[model_index]
+                  ] if model_index is not None else self.models
 
         data_frame = DataFrame()
         makedir("data/models/stats/latest_benchmark")
 
-        filename = f"data/models/stats/latest_benchmark/{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+        filename = f"data/models/stats/latest_benchmark/{
+            datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
 
         data_frame = DataFrame(
             {
@@ -220,7 +222,8 @@ class Benchmarker:
             )
 
             makedir(f"img/{model_benchmark['model_name'].values[0]}")
-            plt.savefig(f"img/{model_benchmark['model_name'].values[0]}/repetition.png")
+            plt.savefig(
+                f"img/{model_benchmark['model_name'].values[0]}/repetition.png")
             plt.close()
 
     def create_confusion_matrix(self):
@@ -255,7 +258,8 @@ class Benchmarker:
 
         for i in range(2):
             for j in range(2):
-                plt.text(j, i, df.values[i, j], ha="center", va="center", color="black")
+                plt.text(j, i, df.values[i, j],
+                         ha="center", va="center", color="black")
 
         plt.xticks(range(2), df.columns)
         plt.yticks(range(2), df.index)
@@ -323,12 +327,14 @@ class Benchmarker:
                 "Models",
             ],
         )
-        df.to_csv("data/models/stats/wrongly-classified/common-wrongly-classified.csv")
+        df.to_csv(
+            "data/models/stats/wrongly-classified/common-wrongly-classified.csv")
 
     def get_wrongly_classified_for_model(
         self, result_labels: list[str], model_name: str
     ):
-        dataset = next((d for m, d in self.models if m.name == model_name), None)
+        dataset = next(
+            (d for m, d in self.models if m.name == model_name), None)
         if dataset:
             wrongly_classified = [
                 [dataset_label, result_label, comment]
