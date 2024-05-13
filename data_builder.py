@@ -1,4 +1,5 @@
 import itertools
+import re
 from constants import TEST, TRAIN
 from data_parser import Datasets
 from multiprocessing import Pool
@@ -32,6 +33,39 @@ def get_all_dataset_combinations(dataset_type):
                 apply_attributes, [(combo, dataset_type) for combo in combos]
             )
             combinations.extend(results)
+
+    return combinations
+
+def get_all_remove_duplicates_combinations(dataset_type):
+    methods = Datasets(dataset_type).get_all_attributes()
+
+    remove_duplicates_combinations = []
+
+    with Pool() as pool:
+        for i in range(len(methods)):
+            combos : list = list(itertools.permutations(methods, i + 1))
+
+            remove_duplicates_combinations += [combo for combo in combos if "remove_duplicates" in combo]
+            
+        pool.processes = len(remove_duplicates_combinations)
+        results = pool.map(
+            apply_attributes, [(combo, dataset_type) for combo in remove_duplicates_combinations]
+        )
+
+    return results
+
+def get_all_remove_duplicates_variations():
+    methods = Datasets(TRAIN).get_all_attributes()
+    combinations = []
+
+    for i in range(len(methods)):
+        combinations += [
+            "_".join(combo) for combo in itertools.permutations(methods, i + 1)
+        ]
+    
+    combinations = [combo for combo in combinations if "remove_duplicates" in combo]
+
+    print(len(combinations))
 
     return combinations
 
