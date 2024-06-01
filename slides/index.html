@@ -90,7 +90,7 @@
           <section data-auto-animate>
             <pre data-id="code-animation">
                <code data-trim style="font-size: 12px; line-height: 1.2;" data-line-numbers data-ln-start-from="">
-              Datasets(TRAIN).remove_dots().lemmatize().remove_stop_words().remove_duplicates().lowercase()
+              Datasets(TRAIN).remove_dots().lemmatize().remove_stop_words()
                </code>
               </pre>
           </section>
@@ -98,8 +98,8 @@
           <section data-auto-animate>
             <pre data-id="code-animation">
                <code data-trim style="font-size: 12px; line-height: 1.2;" data-line-numbers="2" data-ln-start-from="">
-              Datasets(TRAIN).remove_dots().lemmatize().remove_stop_words().remove_duplicates().lowercase()
-              Datasets(TRAIN).lowercase().remove_dots().lemmatize().remove_stop_words().remove_duplicates()
+              Datasets(TRAIN).remove_dots().lemmatize().remove_stop_words()
+              Datasets(TRAIN).remove_dots().remove_stop_words().lemmatize()
                </code>
               </pre>
           </section>
