@@ -36,6 +36,7 @@ def get_all_dataset_combinations(dataset_type):
 
     return combinations
 
+
 def get_all_remove_duplicates_combinations(dataset_type):
     methods = Datasets(dataset_type).get_all_attributes()
 
@@ -43,16 +44,19 @@ def get_all_remove_duplicates_combinations(dataset_type):
 
     with Pool() as pool:
         for i in range(len(methods)):
-            combos : list = list(itertools.permutations(methods, i + 1))
+            combos: list = list(itertools.permutations(methods, i + 1))
 
-            remove_duplicates_combinations += [combo for combo in combos if "remove_duplicates" in combo]
-            
+            remove_duplicates_combinations += [
+                combo for combo in combos if "remove_duplicates" in combo]
+
         pool.processes = len(remove_duplicates_combinations)
         results = pool.map(
-            apply_attributes, [(combo, dataset_type) for combo in remove_duplicates_combinations]
+            apply_attributes, [(combo, dataset_type)
+                               for combo in remove_duplicates_combinations]
         )
 
     return results
+
 
 def get_all_remove_duplicates_variations():
     methods = Datasets(TRAIN).get_all_attributes()
@@ -62,8 +66,9 @@ def get_all_remove_duplicates_variations():
         combinations += [
             "_".join(combo) for combo in itertools.permutations(methods, i + 1)
         ]
-    
-    combinations = [combo for combo in combinations if "remove_duplicates" in combo]
+
+    combinations = [
+        combo for combo in combinations if "remove_duplicates" in combo]
 
     print(len(combinations))
 
@@ -89,7 +94,8 @@ def get_logistic_regression_train():
         Datasets(TRAIN).lemmatize(),
         Datasets(TRAIN).remove_dots().remove_stop_words(),
         Datasets(TRAIN).remove_dots().lowercase().remove_stop_words(),
-        Datasets(TRAIN).remove_dots().lemmatize().remove_stop_words(),
+        Datasets(TRAIN).remove_dots().lemmatize(
+        ).remove_stop_words().remove_duplicates().lowercase(),
     ]
 
 
