@@ -37,8 +37,8 @@
         <section>
           <h2>Introduction</h2>
 
-          <section>
-            <h3>The Team</h3>
+          <section data-auto-animate>
+            <h3>The Group</h3>
 
             <div style="display: flex; justify-content: center; gap: 20px">
               <div
@@ -56,9 +56,11 @@
                     border-radius: 8px;
                     object-fit: cover;
                   "
-                  src="./images/frederik.jpg"
+                  data-src="./images/frederik.jpg"
                 />
+                <p>
                 Frederik
+                </p>
               </div>
               <div
                 style="
@@ -68,15 +70,18 @@
                 "
               >
                 <img
+                sizes="200px"
                   style="
                     width: 200px;
                     height: 200px;
                     object-fit: cover;
                     border-radius: 8px;
                   "
-                  src="./images/kristian.jpg"
+                  data-src="./images/kristian.jpg"
                 />
+                <p>
                 Kristian
+                </p>
               </div>
               <div
                 style="
@@ -86,22 +91,93 @@
                 "
               >
                 <img
+                sizes="200px"
                   style="
                     width: 200px;
                     height: 200px;
                     object-fit: cover;
                     border-radius: 8px;
+                    object-position: 0px 20%;
                   "
-                  src="./images/kristian.jpg"
+                  data-src="./images/silas.jpg"
                 />
+                <p>
                 Silas
+                </p>
               </div>
             </div>
           </section>
 
-          <section>
-            <h3>Motivation</h3>
+          <section data-auto-animate>
+            <div style="display: flex; justify-content: center; gap: 20px; margin-top: -200px;">
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                "
+              >
+                <img
+                  sizes="100px"
+                  style="
+                    height: 100px;
+                    width: 100px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                  "
+                  data-src="./images/frederik.jpg"
+                />
+              </div>
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                "
+              >
+                <img
+                sizes="100px"
+                  style="
+                    width: 100px;
+                    height: 100px;
+                    object-fit: cover;
+                    border-radius: 50%;
+                  "
+                  data-src="./images/kristian.jpg"
+                />
+              </div>
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                "
+              >
+                <img
+                sizes="100px"
+                  style="
+                    width: 100px;
+                    height: 100px;
+                    object-fit: cover;
+                    border-radius: 50%;
+                    object-position: 0px 20%;
+                  "
+                  data-src="./images/silas.jpg"
+                />
+              </div>
+            </div>
+            <h3 style="margin-top: 40px;">
+              The Project
+            </h3>
+
+            <p>Detecting hateful comments on danish social media</p>
           </section>
+        </section>
+
+        <section>
+          <h2>Dataset</h2>
+          <img data-src="./images/dataset.png">
+          <p>DDSC/dkhate</p>
         </section>
 
         <section>
@@ -156,13 +232,13 @@
           <section>
             <h3>Sanitize Methods</h3>
 
-            <p class="fragment custom blur" data-autoslide="200">Lowercase</p>
-            <p class="fragment custom blur" data-autoslide="200">Stop Words</p>
-            <p class="fragment custom blur" data-autoslide="200">
+            <p class="fragment fade-left" data-autoslide="200">Lowercase</p>
+            <p class="fragment fade-left" data-autoslide="200">Stop Words</p>
+            <p class="fragment fade-left" data-autoslide="200">
               Remove Punctuation
             </p>
-            <p class="fragment custom blur" data-autoslide="200">Lemmatize</p>
-            <p class="fragment custom blur">Remove Duplicates</p>
+            <p class="fragment fade-left" data-autoslide="200">Lemmatize</p>
+            <p class="fragment fade-left">Remove Duplicates</p>
           </section>
           <section data-auto-animate data-autoslide="600">
             <pre data-id="code-animation">
@@ -172,32 +248,13 @@
               </pre>
           </section>
 
-          <section data-auto-animate data-autoslide="600">
-            <pre data-id="code-animation">
-               <code data-trim style="font-size: 14px; line-height: 1.3;" data-line-numbers data-ln-start-from="">
-              Datasets(TRAIN).remove_dots().lemmatize().remove_stop_words()
-              Datasets(TRAIN).remove_stop_words().remove_dots().lemmatize()
-               </code>
-              </pre>
-          </section>
-
-          <section data-auto-animate data-autoslide="600">
-            <pre data-id="code-animation">
-               <code data-trim style="font-size: 14px; line-height: 1.3;" data-line-numbers data-ln-start-from="">
-              Datasets(TRAIN).remove_dots().lemmatize().remove_stop_words()
-              Datasets(TRAIN).remove_stop_words().remove_dots().lemmatize()
-              Datasets(TRAIN).lemmatize().remove_stop_words().remove_dots()
-               </code>
-              </pre>
-          </section>
-
           <section data-auto-animate>
             <pre data-id="code-animation">
                <code data-trim style="font-size: 14px; line-height: 1.3;" data-line-numbers data-ln-start-from="">
-              Datasets(TRAIN).remove_dots().lemmatize().remove_stop_words()
-              Datasets(TRAIN).remove_stop_words().remove_dots().lemmatize()
-              Datasets(TRAIN).lemmatize().remove_stop_words().remove_dots()
-              ...
+                Datasets(TRAIN).remove_dots().lemmatize().remove_stop_words()
+                Datasets(TRAIN).remove_stop_words().remove_dots().lemmatize()
+                Datasets(TRAIN).lemmatize().remove_stop_words().remove_dots()
+                ...
                </code>
               </pre>
           </section>
@@ -361,7 +418,7 @@
                 self.data_length = len(self.dataset[OFF]) + len(self.dataset[NOT])
                 self.variation_name = ""
                 self.bias_term = 0
-                self.weights = [0, 0, 0, 0, 0, 0]
+                self.weights = [0, 0]
 
                 self.positive_words: set = set()
                 pos_words = open("data/sentiment-lexicons/positive_words_da.txt", "r")
