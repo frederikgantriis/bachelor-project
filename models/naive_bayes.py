@@ -58,7 +58,7 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
                 # the amount of the word used in the class compared to the total amount of
                 # words used in the class.
                 self.loglikelihood[(word.text, c)] = math.log10(
-                    (count + self.k_factor) / (n_words - count + self.k_factor)
+                    (count + self.k_factor) / (n_words)
                 )
 
             # update the train data parameters
@@ -106,7 +106,7 @@ class NaiveBayes(MLAlgorithm):  # pragma: no cover
         sum = 0
         for word in vocabulary:
             if word.text in words.keys():
-                sum += words[word.text] + 1
+                sum += words[word.text] + self.k_factor
             else:
-                sum += 1
+                sum += self.k_factor
         return sum
